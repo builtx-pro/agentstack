@@ -1,3 +1,4 @@
+import {translate as t} from '@shared/i18n';
 import {z} from 'zod';
 import {ApiError,request} from '@shared/api/client';
 import {retryDelayMs,waitForUploadLimit} from '../lib/upload-wait.util';
@@ -16,5 +17,5 @@ export async function uploadProjectFile(projectId:string,file:File,options:{sign
    options.onWait?.({delayMs,attempt,maxAttempts});await waitForUploadLimit(delayMs,options.signal);
   }
  }
- throw new Error('Upload retry limit reached.');
+ throw new Error(t("Upload retry limit reached."));
 }

@@ -3,7 +3,7 @@
 This contract coordinates the first implementation. All endpoints are under `/api/v1`. JSON responses; errors `{error:{code,message}}`. UUID internal IDs, opaque keyset cursors, max limit 100, except the object catalog which allows 1000. Success detail is an object; lists are `{items,nextCursor}`. APIs never return credential hashes or internal storage paths.
 
 ## Authentication
-- `POST /auth/login {email,password}` → `{user}` and HttpOnly session cookie.
+- `POST /auth/login {email,password}` → `{user}` and HttpOnly session cookie, or `{mfaRequired:true,challenge,expiresAt}` without a cookie for enrolled accounts. Complete `/auth/mfa/verify` with a TOTP/recovery code. See [personal account API](account.md).
 - `POST /auth/logout` invalidates session.
 - `GET /auth/me` → `{user:{id,email,name,isAdmin},csrfToken}`.
 - Browser writes send exact Origin and `X-AgentStack-Request: 1` (JSON only); strict origin allowlist. Sessions are same-site, host-only.
@@ -120,3 +120,7 @@ All routes below are relative to `/projects/:projectId/repositories`. Connection
 | GET `/pipelines` | Cached summaries; customers only see explicitly shared status without source URL/commit |
 
 Up to 20 connections per project, 12 roots, 200 Markdown files, 128 KiB per file and 4 MiB aggregate source text. The serialized changeset also must fit below the client response budget; oversized results fail rather than truncate. Local snapshot JSON bodies are limited to 8 MiB for encoding overhead. Identical latest snapshots are reused; mutations are not automatically retried. Provider refresh has a 15-second cooldown and request limits. Missing files never delete objects. Selected references must resolve atomically at apply time. See [repository synchronization](../agents/repository-sync.md) for examples, provenance and recovery.
+
+## Personal account
+
+[Profile, preferences, safe avatars, sessions, password changes and TOTP](account.md) use human self-service endpoints with version checks and immutable safe history. Agent tokens cannot access them.

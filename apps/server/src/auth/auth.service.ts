@@ -2,8 +2,6 @@ import type { FastifyRequest } from "fastify";
 import type { Database, Principal } from "../db/database.service.js";
 import {
   hashToken,
-  newSecret,
-  verifyPassword,
   hashPassword,
 } from "../shared/crypto.util.js";
 import { AppError, forbidden, missing } from "../shared/errors.js";
@@ -81,35 +79,6 @@ export async function authenticate(
     key: `user:${row.id}`,
     scopes: ["read", "write", "review"],
   };
-}
-export async function login(
-  database: Database,
-  email: string,
-  password: string,
-) {
-  const row = (
-    await database.pool.query(
-      "SELECT * FROM users WHERE email=$1 AND NOT disabled",
-      [email],
-    )
-  ).rows[0];
-  const valid = await verifyPassword(
-    password,
-    row?.password_hash ??
-      "scrypt:00000000000000000000000000000000:" + "00".repeat(64),
-  );
-  if (!row || !valid)
-    throw new AppError(
-      401,
-      "invalid_credentials",
-      "Email or password is incorrect.",
-    );
-  const secret = newSecret();
-  await database.pool.query(
-    "INSERT INTO sessions(hash,user_id,expires_at) VALUES($1,$2,now()+interval '7 days')",
-    [hashToken(secret), row.id],
-  );
-  return { user: publicUser(row), secret };
 }
 export async function createUser(
   database: Database,

@@ -314,6 +314,7 @@ export function createCommand(): Command {
       "--password-stdin",
       "Read one password line from noninteractive stdin",
     )
+    .option("--mfa-stdin", "Read a verification code from the second protected stdin line")
     .option("--apply", "Upload files and apply; default is a read-only dry run")
     .option(
       "--git <directory>",
@@ -342,9 +343,9 @@ export function createCommand(): Command {
           .parse(options.maxTotalBytes),
       );
       const scope = project(command);
-      if (!options.human && (options.email || options.passwordStdin))
+      if (!options.human && (options.email || options.passwordStdin || options.mfaStdin))
         throw new Error(
-          "--email and --password-stdin require explicit --human.",
+          "--email, --password-stdin and --mfa-stdin require explicit --human.",
         );
       const session = options.human
         ? await loginFromStdin(
@@ -352,6 +353,7 @@ export function createCommand(): Command {
             options.email,
             options.passwordStdin,
             global(command).timeoutMs,
+            options.mfaStdin,
           )
         : undefined;
       const api = session?.client ?? connection(command);

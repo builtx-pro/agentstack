@@ -51,6 +51,7 @@ const checklist = z
 export const objectDataSchemas = {
   screen: z
     .object({
+      order: z.number().int().nonnegative().max(1000000).optional(),
       screenId: z.string().max(200).optional(),
       variant: z.string().max(80).optional(),
       palette: z.string().max(80).optional(),
@@ -72,6 +73,7 @@ export const objectDataSchemas = {
     .strict(),
   flow: z
     .object({
+      order: z.number().int().nonnegative().max(1000000).optional(),
       screenIds: refs,
       stateIds: refs.optional(),
       role: z.string().max(100).optional(),

@@ -20,6 +20,8 @@ Do not commit `.env`, `.data`, exports or backups. There are no default shared c
 
 ## VPS
 
+For a new dedicated Ubuntu/Debian host, use the [one-command VPS installer](vps-one-command.md). It sets up Docker, the first administrator, an exact trusted proxy address and Caddy HTTPS without requiring host Node.js. The manual route below remains available for existing reverse proxies and custom infrastructure.
+
 Generate configuration with `--origin https://review.example.com`. Keep the application bound to loopback and put a TLS reverse proxy in front of it. See `infra/Caddyfile.example`. Configure DNS and allow inbound TLS on the proxy, not PostgreSQL. Origin must exactly match the URL reviewers use.
 
 When using a reverse proxy, set `TRUST_PROXY` in `.env` to the exact immediate proxy address seen by the app. With a host proxy and Docker port publishing this is commonly the Compose network gateway, not `127.0.0.1`. Inspect it with `docker network inspect agentstack_internal` and verify the peer address in application request logs. For example `TRUST_PROXY=172.23.0.1` is appropriate only if that is your actual gateway. Compose forwards this setting to the app. Recreate the app container after changing it.

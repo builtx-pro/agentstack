@@ -546,7 +546,7 @@ test("stale apply is not retried and refresh requires a new selection", async ({
   ).toHaveCount(0);
   await confirmation.getByRole("button", { name: "Reload preview" }).click();
   await expect(confirmation).toHaveCount(0);
-  await expect(page.getByText("0 selected", { exact: true })).toBeVisible();
+  await expect(page.getByText("Selected: 0", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Apply selected changes" }),
   ).toBeDisabled();
@@ -590,7 +590,7 @@ test("bulk selection excludes unacknowledged conflicts, missing and unchanged en
   await page
     .getByRole("button", { name: "Select all eligible (1)", exact: true })
     .click();
-  await expect(page.getByText("1 selected", { exact: true })).toBeVisible();
+  await expect(page.getByText("Selected: 1", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("checkbox", { name: "Repository brief", exact: true }),
   ).not.toBeChecked();

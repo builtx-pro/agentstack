@@ -55,3 +55,7 @@ A timeout can happen after the server commits an import. The CLI never automatic
 ## Repository connections and CI
 
 Use `repositories list/get/pipelines/snapshots/snapshot` to inspect connections and staged changes. `repositories sync CONNECTION --repo DIR` previews committed HEAD; add `--stage` to submit it for human review. `repositories refresh CONNECTION` reads a configured GitHub/GitLab branch and stages provider data. Neither command applies changes. Use global `--project PROJECT --timeout-ms 120000` for provider refresh. See [repository sync, limits and CI templates](repository-sync.md).
+
+## Human imports with two-factor authentication
+
+For an enrolled human account, add `--mfa-stdin` together with `--human --email you@example.com --password-stdin`. Redirect a protected file with exactly two lines: password, then a current authenticator or unused recovery code. The code is not accepted as a command-line argument. Do not commit this file; remove it after the operation. SDK callers can supply the ephemeral `mfaCode` option to `createHumanSession`. Without a code, the client reports `mfa_required` and does not create a session. MCP continues using scoped agent tokens and never asks for a human password or factor.

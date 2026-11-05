@@ -44,6 +44,15 @@ CREATE TABLE events (id INTEGER,comment_id INTEGER,status TEXT,author TEXT,princ
         self.assertEqual(len([x for x in manifest['objects'] if x['kind']=='screen']),12)
         keys={x['key'] for x in manifest['objects']}
         self.assertIn('login:E:',keys);self.assertIn('login:J:',keys)
+    def test_preserves_source_flow_order_and_first_occurrence_screen_order(self):
+        self.write('prototypes/ui/_shared/journeys/catalog.json', {'screens':[{'id':'error','title':'Error'},{'id':'start','title':'Start'},{'id':'extra','title':'Extra'}], 'flows':[{'id':'F40','title':'First','steps':['start','login'],'states':['error']},{'id':'F02','title':'Second','steps':['login','error'],'states':[]}]})
+        exporter.export_project(self.source,self.output,self.db,'sample','Example',None)
+        objects=json.loads((self.output/'manifest.json').read_text())['objects']
+        flows=[o for o in objects if o['kind']=='flow' and o['key'].endswith(':E:')]
+        self.assertEqual([(o['key'],o['data']['order']) for o in flows],[('flow:F40:E:',0),('flow:F02:E:',1)])
+        screens=[o for o in objects if o['kind']=='screen' and o['key'].endswith(':E:')]
+        self.assertEqual(sorted([(o['data']['screenId'],o['data']['order']) for o in screens],key=lambda item:item[1]),[('start',0),('login',1),('error',2),('extra',3)])
+
     def test_missing_target_becomes_archived_tombstone(self):
         conn=sqlite3.connect(self.db);conn.execute("UPDATE comments SET screen='missing',palette='day'");conn.commit();conn.close()
         result=exporter.export_project(self.source,self.output,self.db,'sample','Example',None)

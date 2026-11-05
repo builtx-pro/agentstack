@@ -28,7 +28,7 @@ test('legacy asset bookmark resolves its stable key and opens asset viewer',asyn
 });
 test('missing or inaccessible bookmarked comment stays an error instead of opening another target',async({page})=>{
  await legacyFixture(page);await page.route('**/api/v1/projects/*/legacy?*',route=>route.fulfill({status:404,json:{error:{code:'not_found',message:'Saved review not found'}}}));
- await page.goto(`/legacy?project=${projectId}&kind=screen&key=g16%3AJ%3A&note=8`);await expect(page.getByRole('alert').filter({hasText:'Saved review not found'})).toBeVisible();await expect(page.getByRole('dialog')).toHaveCount(0);expect(new URL(page.url()).pathname).toBe('/legacy');
+ await page.goto(`/legacy?project=${projectId}&kind=screen&key=g16%3AJ%3A&note=8`);await expect(page.getByRole('alert').filter({hasText:'This item is unavailable.'})).toBeVisible();await expect(page.getByRole('dialog')).toHaveCount(0);expect(new URL(page.url()).pathname).toBe('/legacy');
 });
 test('login cannot redirect to an external returnTo destination',async({page})=>{
  await setupReviewApi(page);await page.goto('/login?returnTo=https%3A%2F%2Foutside.example%2F');await expect(page).toHaveURL(/127\.0\.0\.1:4310\/($|projects)/);
@@ -49,5 +49,5 @@ test('three comments refresh discussion and card counts without downloading the 
  page.on('request',request=>{if(request.method()==='GET'&&new URL(request.url()).pathname.endsWith('/objects'))catalogRequests++;});
  await page.goto('/projects/project-one/screens?mode=grid');await page.getByRole('button',{name:'Review Choose a recovery method'}).click();
  for(let index=1;index<=3;index++){await page.getByLabel('Leave a note').fill(`Focused review ${index}`);await page.getByRole('button',{name:'Add comment',exact:true}).click();await expect(page.getByText(`Focused review ${index}`,{exact:true})).toBeVisible();await expect(page.getByLabel('Leave a note')).toHaveValue('');}
- await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.getByRole('article').filter({has:page.getByRole('button',{name:'Review Choose a recovery method'})})).toContainText('3 notes');expect(catalogRequests).toBe(1);
+ await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.getByRole('article').filter({has:page.getByRole('button',{name:'Review Choose a recovery method'})})).toContainText('Notes: 3');expect(catalogRequests).toBe(1);
 });

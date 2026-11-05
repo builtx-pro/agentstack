@@ -36,3 +36,9 @@ Use isolated worktrees and explicit file ownership. Do not push, edit main/dev, 
 ## Documentation
 
 Keep epics and stories truthful. Only verified behavior may be marked done. Document limitations, migrations and recovery. Public documentation is in English; product design notes may be bilingual.
+
+## Frontend semantics and runtime quality
+
+Use native semantic HTML by purpose, including landmarks, headings, lists, forms, buttons and links; div/span remain appropriate for neutral grouping. Inspect the rendered Mantine DOM, accessible names, keyboard/focus behavior and dialog focus return. Avoid nested interactive controls.
+
+Implement initial skeletons, background refresh, empty/error/retry and mutation states without layout shifts or lost input. Use scoped stable query keys, deliberate cache lifetimes, cancellation and targeted invalidation; avoid request loops and unbounded lists. Measure expensive renders before memoizing. Before delivery, check the real browser's console/network, layout, loading transitions and accessibility as well as tests/build. Do not claim performance improvements without evidence.

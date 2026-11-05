@@ -3,3 +3,4 @@ export * from "./auth.schema.js";
 export * from "./review.schema.js";
 
 export * from "./repository.schema.js";
+export * from './account.schema.js';

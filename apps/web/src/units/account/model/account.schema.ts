@@ -1,0 +1,12 @@
+import {z} from 'zod';
+import {userSchema} from '@shared/api/schemas';
+export const preferencesSchema=z.object({locale:z.enum(['ru','en']).nullable(),theme:z.enum(['light','dark','auto']),accent:z.string().regex(/^#[0-9a-f]{6}$/i),onboardingCompleted:z.boolean()});
+export const accountSchema=z.object({user:userSchema,version:z.number().int(),preferences:preferencesSchema,avatarUrl:z.string().nullable(),mfaEnabled:z.boolean(),recoveryCodesRemaining:z.number().int()});
+export const sessionSchema=z.object({id:z.string(),createdAt:z.string(),expiresAt:z.string(),current:z.boolean()});
+export const historySchema=z.object({id:z.string(),version:z.number(),action:z.string(),createdAt:z.string(),snapshot:z.record(z.string(),z.unknown())});
+export type Account=z.infer<typeof accountSchema>;
+export type Preferences=z.infer<typeof preferencesSchema>;
+export type AccountPatch={expectedVersion:number;name?:string;preferences?:Partial<Preferences>};
+export const factorResultSchema=z.object({account:accountSchema,recoveryCodes:z.array(z.string()).optional()});
+export const setupSchema=z.object({secret:z.string(),otpauthUrl:z.string(),expiresAt:z.string()});
+export type MfaSetup=z.infer<typeof setupSchema>;

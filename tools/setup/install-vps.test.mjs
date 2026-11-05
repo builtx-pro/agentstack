@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {mkdtempSync,mkdirSync,writeFileSync,symlinkSync,rmSync,realpathSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+const script=resolve('tools/setup/install-vps.sh');
+const revision='a'.repeat(40);
+const run=(args=[])=>spawnSync('bash',[script,'--check','--domain','review.example.com','--email','owner@example.com','--revision',revision,...args],{encoding:'utf8'});
+test('valid preflight is read-only and does not require Linux/root/docker',()=>{const result=run();assert.equal(result.status,0,result.stderr);assert.match(result.stdout,/validated/);});
+test('rejects shell/config injection and nonpublic domains',()=>{for(const domain of ['x;touch /tmp/agentstack-injection','https://example.com','localhost','127.0.0.1','*.example.com','x\nexample.com','-bad.example.com'])assert.notEqual(run(['--domain',domain]).status,0,domain);for(const email of ['a@example.com\nEVIL=1','$(id)@example.com',"a'@example.com"])assert.notEqual(run(['--email',email]).status,0,email);});
+test('requires immutable full revision and valid option values',()=>{for(const ref of ['main','v0.3.0','abc','-x'])assert.notEqual(run(['--revision',ref]).status,0);assert.notEqual(run(['--unknown']).status,0);assert.notEqual(run(['--domain']).status,0);});
+test('refuses directories with unrelated files or symlink parents',()=>{const root=mkdtempSync(join(realpathSync(tmpdir()),'agentstack-installer-'));try{mkdirSync(join(root,'existing'));writeFileSync(join(root,'existing','keep'),'original');assert.notEqual(run(['--directory',join(root,'existing')]).status,0);symlinkSync(join(root,'existing'),join(root,'link'));assert.notEqual(run(['--directory',join(root,'link','child')]).status,0);assert.equal(spawnSync('cat',[join(root,'existing','keep')],{encoding:'utf8'}).stdout,'original');}finally{rmSync(root,{recursive:true,force:true})}});
+test('allows matching interrupted marker and rejects changes or symbolic state',()=>{const root=mkdtempSync(join(realpathSync(tmpdir()),'agentstack-installer-'));try{writeFileSync(join(root,'.agentstack-installer'),'agentstack-vps-v1\n');writeFileSync(join(root,'.install-domain'),'review.example.com\n');writeFileSync(join(root,'.install-email'),'owner@example.com\n');writeFileSync(join(root,'.install-revision'),revision+'\n');assert.equal(run(['--directory',root]).status,0);assert.notEqual(run(['--directory',root,'--domain','other.example.com']).status,0);rmSync(join(root,'.install-email'));symlinkSync('/dev/null',join(root,'.install-email'));assert.notEqual(run(['--directory',root]).status,0);}finally{rmSync(root,{recursive:true,force:true})}});

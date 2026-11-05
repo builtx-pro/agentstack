@@ -1,4 +1,4 @@
-import { Paper, Stack, ThemeIcon, Text, Title } from '@mantine/core';
-import { IconStack2 } from '@tabler/icons-react';
-import type { ReactNode } from 'react';
-export function EmptyState({title,description,action}:{title:string;description:string;action?:ReactNode}){return <Paper withBorder p="xl"><Stack align="center" gap="md" py="xl"><ThemeIcon size={56} radius="xl" variant="light"><IconStack2 size={27}/></ThemeIcon><Title order={3} ta="center">{title}</Title><Text c="dimmed" ta="center" maw={460}>{description}</Text>{action}</Stack></Paper>;}
+import {Paper,Stack,Text,Title} from '@mantine/core';
+import type {ReactNode} from 'react';
+import {SectionIllustration,type SectionIllustrationName} from './section-illustration.component';
+export function EmptyState({title,description,action,illustration='knowledge'}:{title:string;description:string;action?:ReactNode;illustration?:SectionIllustrationName}){return <Paper component="section" withBorder p="xl"><Stack align="center" gap="md" py="lg"><SectionIllustration name={illustration} size={112}/><Title order={2} size="h3" ta="center">{title}</Title><Text c="dimmed" ta="center" maw={460}>{description}</Text>{action}</Stack></Paper>;}

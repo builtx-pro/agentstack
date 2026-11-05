@@ -3,6 +3,8 @@
 ## Start using AgentStack
 
 - [Install locally or on a VPS](runbooks/installation.md)
+- [One-command VPS installation](runbooks/vps-one-command.md)
+- [Account, appearance and two-factor authentication](api/account.md)
 - [Backup, restore and upgrade](runbooks/backup-restore.md)
 - [Synthetic starter](../examples/starter/README.md)
 - [Migrate a Concepts catalog](runbooks/migration.md)
@@ -39,3 +41,5 @@ Planning documents describe the intended contract. Story records and release ver
 
 - [Repository connections, reviewed sync and CI templates](agents/repository-sync.md)
 - [0.2.0 repository integration verification](releases/0.2.0-verification.md)
+
+- [0.3.0 workspace verification](releases/0.3.0-verification.md)

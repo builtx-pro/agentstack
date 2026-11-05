@@ -32,6 +32,10 @@ Saving a comment does not launch an LLM or spend provider credits. AgentStack co
 
 The public repository contains the engine and a fictional starter project. Your imported screenshots, comments, credentials and customer data stay in your deployment.
 
+## Install on a VPS
+
+For a clean Ubuntu/Debian VPS, the [one-command installer](docs/runbooks/vps-one-command.md) configures Docker, the first administrator, your domain and automatic HTTPS. It pins the source commit, preserves interrupted-install state and refuses to overwrite existing deployments. No host Node.js installation is required.
+
 ## Quick start
 
 Requirements: Docker with Compose, Git and Node.js 22.22 or later.

@@ -1,3 +1,4 @@
+import {translate as t} from '@shared/i18n';
 import { z } from 'zod';
 export class ApiError extends Error { constructor(public status:number, public code:string, message:string, public retryAfter?:string|null) { super(message); } }
 export async function request<T>(path:string,schema:z.ZodType<T>,options:RequestInit={}) : Promise<T> {
@@ -8,7 +9,7 @@ export async function request<T>(path:string,schema:z.ZodType<T>,options:Request
 }
 export async function collection<T>(path:string,schema:z.ZodType<T>,signal?:AbortSignal,pageSize=100):Promise<T[]> {
  const result:T[]=[];let cursor:string|undefined;const seen=new Set<string>();
- do {const delimiter=path.includes('?')?'&':'?';const page=await request(`${path}${delimiter}limit=${pageSize}${cursor?`&cursor=${encodeURIComponent(cursor)}`:''}`,z.object({items:z.array(schema),nextCursor:z.string().nullish()}),{signal});result.push(...page.items);cursor=page.nextCursor??undefined;if(cursor){if(seen.has(cursor)||seen.size>999)throw new Error('Pagination could not complete. Narrow the search.');seen.add(cursor);}}while(cursor);
+ do {const delimiter=path.includes('?')?'&':'?';const page=await request(`${path}${delimiter}limit=${pageSize}${cursor?`&cursor=${encodeURIComponent(cursor)}`:''}`,z.object({items:z.array(schema),nextCursor:z.string().nullish()}),{signal});result.push(...page.items);cursor=page.nextCursor??undefined;if(cursor){if(seen.has(cursor)||seen.size>999)throw new Error(t("Pagination could not complete. Narrow the search."));seen.add(cursor);}}while(cursor);
  return result;
 }
 export const jsonBody=(value:unknown)=>JSON.stringify(value);

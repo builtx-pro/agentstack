@@ -1,0 +1,16 @@
+.layout {display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start;}
+.navigation {position:sticky;top:100px;}
+.contents {padding:0;margin:0;list-style:none;display:grid;gap:5px;}
+.topic {font:inherit;font-size:14px;border:0;background:none;color:var(--mantine-color-dimmed);padding:11px 13px;border-radius:10px;width:100%;text-align:start;cursor:pointer;line-height:1.5;}
+.topic:hover {background:var(--mantine-color-default-hover);color:var(--mantine-color-text);}
+.topic[aria-current='step'] {background:var(--mantine-color-violet-light);color:var(--mantine-color-violet-light-color);font-weight:650;}
+.article {background:var(--app-panel);border:1px solid var(--app-border);border-radius:24px;padding:clamp(20px,3vw,40px);min-width:0;}
+.intro {display:flex;align-items:center;gap:20px;margin-bottom:28px;}
+.intro > div {min-width:0;flex:1;}
+.steps {padding-inline-start:26px;display:grid;gap:18px;line-height:1.75;margin-block:0 28px;}
+.steps li {padding-inline-start:8px;}
+.steps li::marker {color:var(--mantine-color-violet-6);font-weight:700;}
+.agent {background:var(--mantine-color-violet-light);}
+.footer {border-top:1px solid var(--app-border);padding-top:24px;margin-top:32px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+@media(max-width:62em){.layout{grid-template-columns:220px minmax(0,1fr);gap:20px}.art{width:90px;height:90px}}
+@media(max-width:48em){.layout{display:block}.navigation{position:static;margin-bottom:20px}.contents{display:none}.intro{align-items:flex-start;gap:8px}.art{width:72px;height:72px}.footer{gap:6px}.article{border-radius:18px}}

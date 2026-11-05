@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { useState } from "react";
 import {
   Alert,
@@ -32,7 +33,7 @@ export function SnapshotPreview({
   connection: Repository;
   snapshotId: string;
   onClose: () => void;
-}) {
+}) {const {t}=useI18n();
   const query = useSnapshot(projectId, connection.id, snapshotId);
   const objects = WorkspaceService.useObjects(projectId);
   const actions = useRepositoryActions(projectId);
@@ -88,16 +89,13 @@ export function SnapshotPreview({
     <Modal
       opened
       onClose={onClose}
-      title="Review repository changes"
-      closeButtonProps={{ "aria-label": "Close repository preview" }}
+      title={t("Review repository changes")}
+      closeButtonProps={{ "aria-label": t("Close repository preview") }}
       size="xl"
     >
       <Stack>
         {connection.archived && (
-          <Alert color="gray">
-            This connection is archived. History is available for reading;
-            restore the connection before applying changes.
-          </Alert>
+          <Alert color="gray">{t("This connection is archived. History is available for reading; restore the connection before applying changes.")}</Alert>
         )}
         {query.error ? (
           <Alert color="red">
@@ -106,12 +104,10 @@ export function SnapshotPreview({
               size="xs"
               variant="subtle"
               onClick={() => void query.refetch()}
-            >
-              Reload preview
-            </Button>
+            >{t("Reload preview")}</Button>
           </Alert>
         ) : query.isPending ? (
-          <Text>Loading snapshot…</Text>
+          <Text>{t("Loading snapshot…")}</Text>
         ) : (
           query.data && (
             <>
@@ -123,18 +119,14 @@ export function SnapshotPreview({
                   color={query.data.source === "provider" ? "teal" : "gray"}
                 >
                   {query.data.source === "provider"
-                    ? "Fetched from provider"
-                    : "Reported checkout"}
+                    ? t("Fetched from provider")
+                    : t("Reported checkout")}
                 </Badge>
               </Group>
               <Text size="sm" c="dimmed">
-                {entries.length} entries. Missing files remain in the workspace.
-                Applying changes never accepts review comments.
-              </Text>
+                {t('Entries: {count}. Missing files remain in the workspace. Applying changes never accepts review comments.',{count:entries.length})}</Text>
               {applied && (
-                <Alert color="teal">
-                  Selected changes were applied as new revisions.
-                </Alert>
+                <Alert color="teal">{t("Selected changes were applied as new revisions.")}</Alert>
               )}
               {actions.apply.error && (
                 <Alert color="red">
@@ -143,14 +135,12 @@ export function SnapshotPreview({
                     size="xs"
                     variant="subtle"
                     onClick={() => void reloadPreview()}
-                  >
-                    Reload preview
-                  </Button>
+                  >{t("Reload preview")}</Button>
                 </Alert>
               )}
               <Group justify="space-between">
                 <Group gap="xs">
-                  <Text size="sm">{selected.length} selected</Text>
+                  <Text size="sm">{t('Selected: {count}',{count:selected.length})}</Text>
                   <Button
                     size="xs"
                     variant="light"
@@ -158,17 +148,14 @@ export function SnapshotPreview({
                     onClick={() =>
                       setSelected(eligibleEntries.map((entry) => entry.key))
                     }
-                  >
-                    Select all eligible ({eligibleEntries.length})
+                  >{t('Select all eligible ({count})',{count:eligibleEntries.length})}
                   </Button>
                   <Button
                     size="xs"
                     variant="subtle"
                     disabled={!selected.length}
                     onClick={() => setSelected([])}
-                  >
-                    Clear selection
-                  </Button>
+                  >{t("Clear selection")}</Button>
                 </Group>
                 <Button
                   disabled={!selected.length || applied || connection.archived}
@@ -176,14 +163,9 @@ export function SnapshotPreview({
                     setConfirm(true);
                     setReviewed(false);
                   }}
-                >
-                  Apply selected changes
-                </Button>
+                >{t("Apply selected changes")}</Button>
               </Group>
-              <Text size="xs" c="dimmed">
-                Conflicts require acknowledgement before selection. Missing and
-                unchanged entries are excluded.
-              </Text>
+              <Text size="xs" c="dimmed">{t("Conflicts require acknowledgement before selection. Missing and unchanged entries are excluded.")}</Text>
               {entries.map((entry) => {
                 const current = objects.data?.find(
                   (object) =>
@@ -226,20 +208,20 @@ export function SnapshotPreview({
                               : "gray"
                         }
                       >
-                        {entry.state}
+                        {t(entry.state)}
                       </Badge>
                     </Group>
                     {entry.reason && (
                       <Text size="sm" c="dimmed" mt="xs">
-                        {entry.reason}
+                        {t(entry.reason)}
                       </Text>
                     )}
                     {conflict && (
                       <Checkbox
                         mt="sm"
-                        label={`Resolve conflict for ${entry.title}`}
+                        label={t('Resolve conflict for {title}',{title:entry.title})}
                         disabled={connection.archived}
-                        description={`I reviewed the workspace revision ${entry.currentVersion ?? "unknown"} and the repository draft.`}
+                        description={t('I reviewed workspace revision {version} and the repository draft.',{version:entry.currentVersion ?? t('unknown')})}
                         checked={conflicts.includes(entry.key)}
                         onChange={(event) => {
                           const checked = event.currentTarget.checked;
@@ -253,14 +235,12 @@ export function SnapshotPreview({
                       />
                     )}
                     {entry.state === "missing" && (
-                      <Text size="sm" c="dimmed" mt="xs">
-                        No deletion or archive will be performed.
-                      </Text>
+                      <Text size="sm" c="dimmed" mt="xs">{t("No deletion or archive will be performed.")}</Text>
                     )}
                     <Button
                       className={classes.compareButton}
                       classNames={{ label: classes.compareButtonLabel }}
-                      aria-label={`${expanded === entry.key ? "Hide comparison" : "Compare changes"}: ${entry.title}`}
+                      aria-label={`${expanded === entry.key ? t("Hide comparison") : t("Compare changes")}: ${entry.title}`}
                       variant="subtle"
                       size="compact-xs"
                       mt="sm"
@@ -269,17 +249,16 @@ export function SnapshotPreview({
                       }
                     >
                       {expanded === entry.key
-                        ? "Hide comparison"
-                        : "Compare changes"}
+                        ? t("Hide comparison")
+                        : t("Compare changes")}
                     </Button>
                     {expanded === entry.key && (
                       <SimpleGrid cols={{ base: 1, md: 2 }} mt="md">
                         <div className={classes.compare}>
-                          <Title order={5} mb="sm">
-                            Current ·{" "}
+                          <Title order={5} mb="sm">{t("Current ·")}{" "}
                             {current
                               ? `v${current.version}`
-                              : "not in workspace"}
+                              : t('not in workspace')}
                           </Title>
                           {current && (
                             <>
@@ -287,11 +266,10 @@ export function SnapshotPreview({
                                 {current.title}
                               </Text>
                               <Text size="xs" c="dimmed" mb="sm">
-                                {current.kind} · {current.status} ·{" "}
-                                {current.visibility}
+                                {t(current.kind)} · {t(current.status)} · {t(current.visibility)}
                               </Text>
                               <details>
-                                <summary>Current metadata</summary>
+                                <summary>{t("Current metadata")}</summary>
                                 <pre>
                                   {JSON.stringify(
                                     {
@@ -324,25 +302,22 @@ export function SnapshotPreview({
                                     null,
                                     2,
                                   )
-                                : "New item"}
+                                : t("New item")}
                             </pre>
                           )}
                         </div>
                         <div className={classes.compare}>
-                          <Title order={5} mb="sm">
-                            Repository draft
-                          </Title>
+                          <Title order={5} mb="sm">{t("Repository draft")}</Title>
                           {entry.draft && (
                             <>
                               <Text size="sm" fw={600}>
                                 {entry.draft.title}
                               </Text>
                               <Text size="xs" c="dimmed" mb="sm">
-                                {entry.draft.kind} · {entry.draft.status} ·{" "}
-                                {entry.draft.visibility}
+                                {t(entry.draft.kind)} · {t(entry.draft.status)} · {t(entry.draft.visibility)}
                               </Text>
                               <details>
-                                <summary>Draft metadata</summary>
+                                <summary>{t("Draft metadata")}</summary>
                                 <pre>
                                   {JSON.stringify(
                                     {
@@ -366,7 +341,7 @@ export function SnapshotPreview({
                             <pre>
                               {entry.draft
                                 ? JSON.stringify(entry.draft, null, 2)
-                                : "File missing from this snapshot"}
+                                : t("File missing from this snapshot")}
                             </pre>
                           )}
                         </div>
@@ -382,23 +357,17 @@ export function SnapshotPreview({
       <Modal
         opened={confirm}
         onClose={() => setConfirm(false)}
-        title="Confirm repository changes"
-        closeButtonProps={{ "aria-label": "Close apply confirmation" }}
+        title={t("Confirm repository changes")}
+        closeButtonProps={{ "aria-label": t("Close apply confirmation") }}
         size="md"
       >
         <Stack>
-          <Text>
-            Apply {chosen.length} selected changes to this project? Existing
-            records receive new revisions.
-          </Text>
+          <Text>{t('Apply {count} selected changes to this project? Existing records receive new revisions.',{count:chosen.length})}</Text>
           {sensitive && (
-            <Alert color="orange">
-              This selection includes agent rules or completed work. Confirm
-              that the new rules and completion evidence are correct.
-            </Alert>
+            <Alert color="orange">{t("This selection includes agent rules or completed work. Confirm that the new rules and completion evidence are correct.")}</Alert>
           )}
           <Checkbox
-            label="I reviewed these changes and approve applying them"
+            label={t("I reviewed these changes and approve applying them")}
             checked={reviewed}
             onChange={(event) => setReviewed(event.currentTarget.checked)}
           />
@@ -409,22 +378,16 @@ export function SnapshotPreview({
                 size="xs"
                 variant="subtle"
                 onClick={() => void reloadPreview()}
-              >
-                Reload preview
-              </Button>
+              >{t("Reload preview")}</Button>
             </Alert>
           )}
           <Group justify="flex-end">
-            <Button variant="default" onClick={() => setConfirm(false)}>
-              Cancel
-            </Button>
+            <Button variant="default" onClick={() => setConfirm(false)}>{t("Cancel")}</Button>
             <Button
               disabled={!reviewed || connection.archived}
               loading={actions.apply.isPending}
               onClick={() => void apply().catch(() => {})}
-            >
-              Confirm and apply
-            </Button>
+            >{t("Confirm and apply")}</Button>
           </Group>
         </Stack>
       </Modal>

@@ -1,0 +1,24 @@
+---
+id: STORY-013-01
+epic: EPIC-013
+title: Find all catalog screens in source order
+status: review
+blocked: false
+priority: must
+milestone: M4
+---
+# Find all catalog screens in source order
+
+## Acceptance
+
+Source ordering, clickable tags, alternate states and RU/EN navigation meet the catalog contract.
+
+Given an unauthorized actor or stale version, the operation fails without disclosing data or losing concurrent changes.
+
+## Verification
+
+- [x] Behavioral tests and applicable API/database checks pass.
+- [x] Real browser checks pass in RU/EN and desktop/mobile where applicable.
+- [ ] Documentation, deployment and preservation evidence are recorded.
+
+[Detailed contract](../../../docs/product/workspace-experience.md)
