@@ -38,3 +38,4 @@
 Planning documents describe the intended contract. Story records and release verification distinguish implemented behavior from outstanding work.
 
 - [Repository connections, reviewed sync and CI templates](agents/repository-sync.md)
+- [0.2.0 repository integration verification](releases/0.2.0-verification.md)

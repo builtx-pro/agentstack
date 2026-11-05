@@ -25,3 +25,29 @@
 .entry:last-child {
   border-bottom: 0;
 }
+
+.entryChoice {
+  flex: 1;
+  min-width: 0;
+}
+.entryLabelWrapper {
+  min-width: 0;
+}
+.entryText {
+  overflow-wrap: anywhere;
+}
+.entryStatus {
+  flex-shrink: 0;
+  max-width: none;
+}
+.compareButton {
+  max-width: 100%;
+  height: auto;
+  min-height: 32px;
+  padding-block: 5px;
+}
+.compareButtonLabel {
+  white-space: normal;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
