@@ -1,6 +1,6 @@
 # API implementation contract v1
 
-This contract coordinates the first implementation. All endpoints are under `/api/v1`. JSON responses; errors `{error:{code,message}}`. UUID internal IDs, opaque keyset cursors, max limit 100. Success detail is an object; lists are `{items,nextCursor}`. APIs never return credential hashes or internal storage paths.
+This contract coordinates the first implementation. All endpoints are under `/api/v1`. JSON responses; errors `{error:{code,message}}`. UUID internal IDs, opaque keyset cursors, max limit 100, except the object catalog which allows 1000. Success detail is an object; lists are `{items,nextCursor}`. APIs never return credential hashes or internal storage paths.
 
 ## Authentication
 - `POST /auth/login {email,password}` → `{user}` and HttpOnly session cookie.
@@ -97,3 +97,7 @@ Single custom Mantine theme, light/dark, neutral slate background + violet accen
 - Claims record `claimedRuleRevisions?: [{id,version}] | null`. The server supplies the snapshot and checks it at submit under the same project rule lock as rule edits. `rules_changed` and `rules_snapshot_required` are recoverable conflicts requiring a deliberate new claim. Customer DTOs omit internal rule IDs.
 - Context also contains bounded `activeClaims` with continuation metadata.
 - `GET /projects/:projectId/legacy?kind=screen|asset&key=...&note=...` resolves authorized Concepts bookmarks to `{targetId,section,noteId?}` without returning private provenance.
+
+### Catalog page size
+
+`GET /projects/:projectId/objects` accepts `limit` from 1 to 1000 (default 50), with the existing cursor and visibility/project filters. Other collection endpoints keep the 100-row maximum. The web catalog requests 1000 rows per page to reduce sequential round trips; this does not grant additional visibility or skip pagination. SDK clients with large document payloads can select smaller pages to remain within their response-byte budget.
