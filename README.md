@@ -82,7 +82,7 @@ Backend tests create an isolated PostgreSQL container. See [CONTRIBUTING.md](CON
 
 ## Release status and boundaries
 
-This is the initial implementation candidate. Release verification and the first private production migration are being completed; do not interpret the roadmap as completed test evidence.
+The 0.1.0 implementation has passed the [recorded release checks](docs/releases/0.1.0-verification.md), including a verified private production migration. Project-specific evidence and credentials remain outside this public repository.
 
 MCP is stdio, not an OAuth-enabled remote MCP service. Git exchange is explicit import/export with version checks, not a background Git synchronizer. Preview URLs remain your responsibility; the embedded frame is sandboxed. No automatic agent runner, email delivery service or claimed productivity benchmark is bundled.
 
