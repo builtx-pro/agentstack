@@ -28,6 +28,11 @@ function run(args: string[]) {
         {
           env: {
             ...process.env,
+            // Runner identity belongs to the outer checkout, not this Git fixture.
+            GITHUB_REF_NAME: undefined,
+            GITHUB_SHA: undefined,
+            CI_COMMIT_BRANCH: undefined,
+            CI_COMMIT_SHA: undefined,
             AGENTSTACK_URL: origin,
             AGENTSTACK_PROJECT: id,
             AGENTSTACK_TOKEN: "synthetic-token",
