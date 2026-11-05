@@ -1,7 +1,7 @@
 import type {Page} from '@playwright/test';
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
-export async function setupReviewApi(page:Page,customer=false){
+export async function setupReviewApi(page:Page,customer=false,locale:'ru'|'en'|null=null){
  const base=process.env.AGENTSTACK_EXAMPLE_ROOT??path.resolve('../../examples/starter');
  const manifest=JSON.parse(await readFile(path.join(base,'manifest.json'),'utf8'));
  const project={id:'project-one',name:'Lumen · Example workspace',slug:'lumen',description:'Help people regain access with confidence.',version:1,archived:false,role:customer?'customer':'admin'};
@@ -10,6 +10,7 @@ export async function setupReviewApi(page:Page,customer=false){
  const notes:any[]=[];const revisions=new Map(objects.map((o:any)=>[o.id,[{id:`revision-${o.id}`,version:1,actorName:'Demo reviewer',source:'web',createdAt:o.createdAt,summary:'Created',snapshot:structuredClone(o)}]]));let failNextPatch=false;
  await page.route('**/api/v1/**',async route=>{const request=route.request();const url=new URL(request.url());const pathname=url.pathname.replace('/api/v1','');const method=request.method();const body=request.postDataJSON();const respond=(data:unknown,status=200)=>route.fulfill({status,json:data});
  if(pathname==='/auth/me')return respond({user,csrfToken:'origin-bound'});
+ if(pathname==='/account'&&method==='GET')return respond({user,version:1,preferences:{locale,theme:'light',accent:'#7950f2',onboardingCompleted:true},avatarUrl:null,mfaEnabled:false,recoveryCodesRemaining:0});
  if(pathname==='/projects')return respond({items:[project],nextCursor:null});
  if(pathname===`/projects/${project.id}`)return respond(project);
  if(pathname.endsWith('/progress'))return respond({total:3,done:1,percent:33.33,byStatus:{done:1,in_progress:1,ready:1},notes:{open:notes.filter(n=>n.status==='open').length,in_progress:0,ready_for_review:0,resolved:0},groups:[{id:'epic-recovery',title:'Recover account access',kind:'epic',done:1,total:3,percent:33.33}],timeline:[{date:'2026-11-04',total:2,done:0},{date:'2026-11-05',total:3,done:1}]});

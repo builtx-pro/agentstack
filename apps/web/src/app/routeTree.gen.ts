@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as GuideRouteImport } from './routes/guide'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LegacyRouteImport } from './routes/legacy'
 import { Route as LoginRouteImport } from './routes/login'
@@ -18,6 +20,16 @@ import { Route as ProjectsProjectIdSectionRouteImport } from './routes/projects.
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteRoute = InviteRouteImport.update({
@@ -44,6 +56,8 @@ const ProjectsProjectIdSectionRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/guide': typeof GuideRoute
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
@@ -51,6 +65,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/guide': typeof GuideRoute
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
@@ -59,6 +75,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/guide': typeof GuideRoute
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
@@ -67,12 +85,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/invite' | '/legacy' | '/login' | '/projects/$projectId/$section'
+    | '/'
+    | '/account'
+    | '/guide'
+    | '/invite'
+    | '/legacy'
+    | '/login'
+    | '/projects/$projectId/$section'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/invite' | '/legacy' | '/login' | '/projects/$projectId/$section'
+  to:
+    | '/'
+    | '/account'
+    | '/guide'
+    | '/invite'
+    | '/legacy'
+    | '/login'
+    | '/projects/$projectId/$section'
   id:
     | '__root__'
     | '/'
+    | '/account'
+    | '/guide'
     | '/invite'
     | '/legacy'
     | '/login'
@@ -81,6 +114,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  GuideRoute: typeof GuideRoute
   InviteRoute: typeof InviteRoute
   LegacyRoute: typeof LegacyRoute
   LoginRoute: typeof LoginRoute
@@ -94,6 +129,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite': {
@@ -129,6 +178,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  GuideRoute: GuideRoute,
   InviteRoute: InviteRoute,
   LegacyRoute: LegacyRoute,
   LoginRoute: LoginRoute,

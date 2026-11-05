@@ -13,7 +13,7 @@ const resource = (id: string, overrides: Partial<ProjectObject> = {}): ProjectOb
   tags: ['project-resource'], visibility: 'customer', status: 'ready', archived: false, version: 1,
   data: { markdown: '[Open](https://example.com)' }, createdAt: '2026-01-01', updatedAt: '2026-01-01', ...overrides,
 });
-const mount = (objects: ProjectObject[], onOpen = vi.fn()) => render(createElement(MantineProvider, { env: 'test' }, createElement(ProjectResources, { objects, onOpen })));
+const mount = (objects: ProjectObject[], onOpen = vi.fn(), onTag=vi.fn()) => render(createElement(MantineProvider, { env: 'test' }, createElement(ProjectResources, { objects, onOpen,onTag })));
 
 describe('project resource navigation', () => {
   it('hides the whole section without active tagged documents', () => {
@@ -21,13 +21,13 @@ describe('project resource navigation', () => {
     expect(screen.queryByRole('heading', { name: 'Project resources' })).toBeNull();
   });
   it('shows active documents in title order and opens the exact selected object', () => {
-    const onOpen = vi.fn();
+    const onOpen = vi.fn();const onTag=vi.fn();
     const objects = [resource('z', { title: 'Presentations' }), resource('a', { title: '3D studio', tags: ['project-resource', 'Tools'] }), resource('hidden', { archived: true })];
-    mount(objects, onOpen);
-    const buttons = screen.getAllByRole('button');
+    mount(objects, onOpen,onTag);
+    const buttons = screen.getAllByRole('button').filter(button=>button.textContent?.startsWith('Open '));
     expect(buttons.map(button => button.textContent)).toEqual(['Open 3D studio', 'Open Presentations']);
     expect(screen.queryByText('hidden')).toBeNull();
-    expect(screen.getByText('Tools')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button',{name:'Tools'}));expect(onTag).toHaveBeenCalledWith('Tools',objects[1]);
     expect(screen.queryByText('project-resource')).toBeNull();
     fireEvent.click(buttons[0]);
     expect(onOpen).toHaveBeenCalledExactlyOnceWith('a');

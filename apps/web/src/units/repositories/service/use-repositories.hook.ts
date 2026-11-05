@@ -1,3 +1,4 @@
+import {translate as t} from '@shared/i18n';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "@shared/api/client";
 import { QueryKeys } from "@shared/lib/query-keys.constant";
@@ -13,16 +14,16 @@ const keys = {
 export function repositoryError(error: unknown) {
   if (error instanceof ApiError) {
     if (error.status === 413)
-      return "This snapshot is too large. Narrow the tracked roots and fetch again.";
+      return t("This snapshot is too large. Narrow the tracked roots and fetch again.");
     if (error.status === 409)
-      return "This connection or project item changed. Refresh the preview before applying.";
+      return t("This connection or project item changed. Refresh the preview before applying.");
     if (error.status === 403)
-      return "Your role cannot perform this repository action.";
+      return t("Your role cannot perform this repository action.");
     if (error.status === 429)
-      return "The provider is rate limited. Try again later.";
-    if (error.status === 401) return "Sign in again to continue.";
+      return t("The provider is rate limited. Try again later.");
+    if (error.status === 401) return t("Sign in again to continue.");
   }
-  return "The repository request did not complete. Check the connection and try again. No automatic retry was made.";
+  return t("The repository request did not complete. Check the connection and try again. No automatic retry was made.");
 }
 export const useRepositories = (id: string, enabled = true) =>
   useQuery({

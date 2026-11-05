@@ -10,7 +10,11 @@
 .cardPreview { background:var(--app-bg);padding:20px;cursor:pointer;border:0;width:100%;display:block; }
 .cardPreview:hover { background:light-dark(#eeedf9,var(--mantine-color-dark-6)); }
 .cardMeta { padding:16px;display:flex;flex-direction:column;flex:1;gap:9px; }
-.cardTags { height:24px;overflow:hidden;display:flex;gap:5px; }
+.cardTags { height:28px;overflow:hidden;padding:3px;display:flex;gap:5px; }
 .cardFooter { padding:12px 16px;border-top:1px solid var(--app-border);display:flex;align-items:center;justify-content:space-between; }
 @media(max-width:62em){.layout{grid-template-columns:minmax(0,1fr) 320px}.discussion{padding-left:18px}.visual{padding:16px}}
 @media(max-width:48em){.layout{grid-template-columns:1fr}.discussion{max-height:none;padding:24px 0 0}.historyGrid{grid-template-columns:1fr}.fullImage{max-height:60vh}.visual{padding:12px}}
+
+.tagButton { cursor:pointer; flex-shrink:0; text-transform:none; }
+.tagButton:hover { background:var(--mantine-color-violet-light);color:var(--mantine-color-violet-light-color); }
+.tagButton:focus-visible { outline:2px solid var(--mantine-color-violet-6);outline-offset:2px; }

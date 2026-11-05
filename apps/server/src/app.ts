@@ -1,3 +1,5 @@
+import {registerAccountRoutes,setSession} from './account/account.routes.js';
+import {beginLogin} from './account/account.service.js';
 import { registerRepositoryRoutes } from "./repositories/repository.routes.js";
 import type { RepositoryFetch } from "./repositories/repository-provider.service.js";
 import Fastify, { type FastifyRequest } from "fastify";
@@ -15,7 +17,6 @@ import {
 import { AppError, forbidden, parse, missing } from "./shared/errors.js";
 import {
   authenticate,
-  login,
   createUser,
   acceptInvitation,
   publicUser,
@@ -85,6 +86,8 @@ export async function buildApp(config: ServerConfig) {
               'res.headers["set-cookie"]',
               "password",
               "token",
+              "secret", "code", "challenge", "recoveryCodes",
+              "req.body.password", "req.body.newPassword", "req.body.code", "req.body.challenge",
             ],
           },
     bodyLimit: 1024 * 1024,
@@ -125,6 +128,7 @@ export async function buildApp(config: ServerConfig) {
     const path = request.url.split("?")[0];
     const publicPath = [
       "/api/v1/auth/login",
+      "/api/v1/auth/mfa/verify",
       "/api/v1/auth/accept-invitation",
       "/api/v1/health",
       "/api/v1/ready",
@@ -246,17 +250,13 @@ export async function buildApp(config: ServerConfig) {
     },
     async (r, reply) => {
       const input = parse(loginSchema, r.body);
-      const result = await login(database, input.email, input.password);
-      reply.setCookie("agentstack_session", result.secret, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "strict",
-        secure: config.secureCookies,
-        maxAge: 7 * 86400,
-      });
+      const result = await beginLogin(database, input.email, input.password);
+      if ('mfaRequired' in result) return result;
+      setSession(reply,result.secret,config.secureCookies);
       return { user: result.user };
     },
   );
+  registerAccountRoutes(app,database,config.repositoryEncryptionKey,config.secureCookies);
   app.post(prefix + "/auth/logout", async (r, reply) => {
     if (principal(r).type !== "human") throw forbidden();
     await database.pool.query("DELETE FROM sessions WHERE hash=$1", [

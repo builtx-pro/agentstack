@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { MantineProvider } from '@mantine/core';
+import {AppThemeProvider} from './providers/app-theme-provider.component';
 import { Notifications } from '@mantine/notifications';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
-import { theme } from '@agentstack/ui';
 import { queryClient } from './query-client.config';
 import { router } from './router';
+import {SessionBoundary} from '@units/auth/ui/session-boundary.component';
 import './global.css';
-ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><MantineProvider theme={theme} defaultColorScheme="light"><Notifications position="top-right"/><QueryClientProvider client={queryClient}><RouterProvider router={router}/></QueryClientProvider></MantineProvider></React.StrictMode>);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><QueryClientProvider client={queryClient}><AppThemeProvider><SessionBoundary><Notifications position="top-right"/><RouterProvider router={router}/></SessionBoundary></AppThemeProvider></QueryClientProvider></React.StrictMode>);

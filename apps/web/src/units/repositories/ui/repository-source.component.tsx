@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { Anchor, Badge, Code, Group, Paper, Stack, Text } from "@mantine/core";
 import { IconGitBranch } from "@tabler/icons-react";
 import { useRepositoryBindings } from "../service/use-repositories.hook";
@@ -26,22 +27,18 @@ export function RepositorySource({
   projectId: string;
   objectId: string;
   version: number;
-}) {
+}) {const {t}=useI18n();
   const query = useRepositoryBindings(projectId, objectId);
   if (query.error)
     return (
-      <Text size="xs" c="dimmed" mt="md">
-        Repository source is temporarily unavailable.
-      </Text>
+      <Text size="xs" c="dimmed" mt="md">{t("Repository source is temporarily unavailable.")}</Text>
     );
   if (!query.data?.items.length) return null;
   return (
     <Paper withBorder p="sm" mt="md">
       <Group gap="xs" mb="sm">
         <IconGitBranch size={16} aria-hidden="true" />
-        <Text size="sm" fw={600}>
-          Repository source
-        </Text>
+        <Text size="sm" fw={600}>{t("Repository source")}</Text>
       </Group>
       <Stack gap="sm">
         {query.data.items.map((binding) => (
@@ -65,13 +62,10 @@ export function RepositorySource({
             )}
             <Group gap="xs" mt={5}>
               <Code>{binding.commit.slice(0, 12)}</Code>
-              <Text size="xs" c="dimmed">
-                Imported as v{binding.lastAppliedVersion}
+              <Text size="xs" c="dimmed">{t('Imported as v{version}',{version:binding.lastAppliedVersion})}
               </Text>
               {version > binding.lastAppliedVersion && (
-                <Badge size="xs" color="orange">
-                  Workspace changed since import
-                </Badge>
+                <Badge size="xs" color="orange">{t("Workspace changed since import")}</Badge>
               )}
             </Group>
           </div>

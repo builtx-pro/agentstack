@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { useState } from "react";
 import { useForm } from "@mantine/form";
 import { useClipboard } from "@mantine/hooks";
@@ -31,7 +32,7 @@ export function Repositories({
 }: {
   projectId: string;
   isAdmin: boolean;
-}) {
+}) {const {t}=useI18n();
   const clipboard = useClipboard();
   const query = useRepositories(projectId);
   const actions = useRepositoryActions(projectId);
@@ -39,7 +40,7 @@ export function Repositories({
     connection: string;
     snapshot: string;
   } | null>(null);
-  const [createError, setCreateError] = useState("");
+  const [createError, setCreateError] = useState<unknown>(null);
   const form = useForm({
     initialValues: {
       provider: "github",
@@ -51,17 +52,17 @@ export function Repositories({
       sharePipelines: false,
     },
     validate: {
-      repository: (value) => (value.trim() ? null : "Enter a repository"),
-      label: (value) => (value.trim() ? null : "Enter a connection name"),
-      branch: (value) => (value.trim() ? null : "Enter a branch"),
-      roots: (value) => (value.trim() ? null : "Enter at least one root"),
+      repository: (value) => (value.trim() ? null : t("Enter a repository")),
+      label: (value) => (value.trim() ? null : t("Enter a connection name")),
+      branch: (value) => (value.trim() ? null : t("Enter a branch")),
+      roots: (value) => (value.trim() ? null : t("Enter at least one root")),
     },
   });
   const connection = query.data?.items.find(
     (item) => item.id === preview?.connection,
   );
   const create = async (values: typeof form.values) => {
-    setCreateError("");
+    setCreateError(null);
     const token = values.token;
     form.setFieldValue("token", "");
     try {
@@ -88,50 +89,44 @@ export function Repositories({
         setPreview({ connection: saved.id, snapshot: snapshot.id });
       }
     } catch (error) {
-      setCreateError(repositoryError(error));
+      setCreateError(error);
     }
   };
   return (
     <Stack gap="lg">
       <div>
         <Group justify="space-between">
-          <Title order={3}>Repositories</Title>
+          <Title order={3}>{t("Repositories")}</Title>
           <Button
             variant="subtle"
             size="xs"
             loading={query.isFetching}
             onClick={() => void query.refetch()}
-          >
-            Reload connections
-          </Button>
+          >{t("Reload connections")}</Button>
         </Group>
-        <Text c="dimmed" mt="xs">
-          Bring project documents and plans from GitHub, GitLab or a local
-          checkout. Fetching creates a reviewable snapshot; applying remains a
-          human decision.
-        </Text>
+        <Text c="dimmed" mt="xs">{t("Bring project documents and plans from GitHub, GitLab or a local checkout. Fetching creates a reviewable snapshot; applying remains a human decision.")}</Text>
       </div>
       {isAdmin && (
         <Paper withBorder p="lg">
           <form onSubmit={form.onSubmit((values) => void create(values))}>
             <Stack>
-              <Title order={4}>Connect a repository</Title>
+              <Title order={4}>{t("Connect a repository")}</Title>
               <SimpleGrid
                 cols={{ base: 1, sm: 2 }}
                 style={{ alignItems: "end" }}
               >
                 <Select
-                  label="Provider"
+                  label={t("Provider")}
                   data={[
-                    { value: "github", label: "GitHub" },
-                    { value: "gitlab", label: "GitLab" },
-                    { value: "local", label: "Local / CI" },
+                    { value: "github", label: t("GitHub") },
+                    { value: "gitlab", label: t("GitLab") },
+                    { value: "local", label: t("Local / CI") },
                   ]}
                   {...form.getInputProps("provider")}
                 />
                 <TextInput
-                  label="Connection name"
-                  placeholder="Product repository"
+                  label={t("Connection name")}
+                  placeholder={t("Product repository")}
                   required
                   {...form.getInputProps("label")}
                 />
@@ -141,7 +136,7 @@ export function Repositories({
                 style={{ alignItems: "end" }}
               >
                 <TextInput
-                  label="Repository"
+                  label={t("Repository")}
                   placeholder={
                     form.values.provider === "local"
                       ? "local-project"
@@ -149,45 +144,43 @@ export function Repositories({
                   }
                   description={
                     form.values.provider === "gitlab"
-                      ? "Nested groups are supported."
-                      : "Use its identifier, not a URL."
+                      ? t("Nested groups are supported.")
+                      : t("Use its identifier, not a URL.")
                   }
                   required
                   {...form.getInputProps("repository")}
                 />
                 <TextInput
-                  label="Branch"
+                  label={t("Branch")}
                   required
                   {...form.getInputProps("branch")}
                 />
               </SimpleGrid>
               <Textarea
-                label="Tracked roots"
-                description="One relative file or directory per line. Markdown only; no globs or parent paths."
+                label={t("Tracked roots")}
+                description={t("One relative file or directory per line. Markdown only; no globs or parent paths.")}
                 minRows={3}
                 required
                 {...form.getInputProps("roots")}
               />
               {form.values.provider !== "local" && (
                 <PasswordInput
-                  label="Provider token"
-                  description="Optional for public repositories. Write-only; never included in page links or CLI snippets."
+                  label={t("Provider token")}
+                  description={t("Optional for public repositories. Write-only; never included in page links or CLI snippets.")}
                   autoComplete="new-password"
                   {...form.getInputProps("token")}
                 />
               )}
               <Switch
-                label="Share pipeline status with customers"
+                label={t("Share pipeline status with customers")}
                 {...form.getInputProps("sharePipelines", { type: "checkbox" })}
               />
-              {createError && <Alert color="red">{createError}</Alert>}
+              {!!createError && <Alert color="red">{repositoryError(createError)}</Alert>}
               <Group justify="flex-end">
                 <Button
                   type="submit"
                   loading={actions.create.isPending || actions.pull.isPending}
-                >
-                  Connect repository
-                </Button>
+                >{t("Connect repository")}</Button>
               </Group>
             </Stack>
           </form>
@@ -200,12 +193,10 @@ export function Repositories({
             variant="subtle"
             size="xs"
             onClick={() => void query.refetch()}
-          >
-            Reload connections
-          </Button>
+          >{t("Reload connections")}</Button>
         </Alert>
       ) : query.isPending ? (
-        <Text>Loading connections…</Text>
+        <Text>{t("Loading connections…")}</Text>
       ) : query.data?.items.length ? (
         query.data.items.map((item) => (
           <RepositoryConnection
@@ -219,29 +210,23 @@ export function Repositories({
           />
         ))
       ) : (
-        <Text c="dimmed">
-          No repositories connected yet.
-          {!isAdmin ? " Ask an administrator to add one." : ""}
+        <Text c="dimmed">{t("No repositories connected yet.")}{" "}{!isAdmin ? t('Ask an administrator to add one.') : ""}
         </Text>
       )}
       <Paper withBorder p="lg">
         <Stack>
-          <Title order={4}>Local checkout and CI</Title>
-          <Text size="sm">
-            Use a scoped agent token from Agent connections. Supply it through
-            your shell or CI secret store. Reported snapshots stay pending until
-            a person reviews and applies them here.
-          </Text>
+          <Title order={4}>{t("Local checkout and CI")}</Title>
+          <Text size="sm">{t("Use a scoped agent token from Agent connections. Supply it through your shell or CI secret store. Reported snapshots stay pending until a person reviews and applies them here.")}</Text>
           <Code
             block
           >{`AGENTSTACK_URL=https://your-instance.example\nAGENTSTACK_PROJECT=${projectId}\nAGENTSTACK_TOKEN=<from your secret store>`}</Code>
-          <Code block>{`# Inspect a local checkout without creating a snapshot
+          <Code block>{`# ${t("Inspect a local checkout without creating a snapshot")}
 node packages/cli/dist/main.js --project ${projectId} repositories sync CONNECTION_ID --repo /path/to/checkout
 
-# Stage a reported snapshot for human review
+# ${t("Stage a reported snapshot for human review")}
 node packages/cli/dist/main.js --project ${projectId} --timeout-ms 120000 repositories sync CONNECTION_ID --repo /path/to/checkout --stage
 
-# Fetch a hosted repository and provider pipelines
+# ${t("Fetch a hosted repository and provider pipelines")}
 node packages/cli/dist/main.js --project ${projectId} repositories refresh CONNECTION_ID`}</Code>
           <Button
             variant="light"
@@ -252,14 +237,9 @@ node packages/cli/dist/main.js --project ${projectId} repositories refresh CONNE
               )
             }
           >
-            {clipboard.copied ? "Copied" : "Copy local / CI command"}
+            {clipboard.copied ? t("Copied") : t("Copy local / CI command")}
           </Button>
-          <Text size="sm" c="dimmed">
-            Replace CONNECTION_ID with a connection identifier shown above.
-            Commands stage snapshots; they never apply changes. These are
-            placeholders. Provider tokens and session passwords are never
-            exported.
-          </Text>
+          <Text size="sm" c="dimmed">{t("Replace CONNECTION_ID with a connection identifier shown above. Commands stage snapshots; they never apply changes. These are placeholders. Provider tokens and session passwords are never exported.")}</Text>
         </Stack>
       </Paper>
       {preview && connection && (

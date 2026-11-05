@@ -1,0 +1,14 @@
+import {z} from 'zod';
+import {request,mutationOptions} from '@shared/api/client';
+import {accountSchema,sessionSchema,historySchema,factorResultSchema,setupSchema,type AccountPatch} from '../model/account.schema';
+export const getAccount=(signal?:AbortSignal)=>request('/account',accountSchema,{signal});
+export const patchAccount=(body:AccountPatch)=>request('/account',accountSchema,mutationOptions('PATCH',body));
+export const uploadAvatar=(file:File,version:number)=>{const body=new FormData();body.append('file',file);return request(`/account/avatar?expectedVersion=${version}`,accountSchema,{method:'PUT',body});};
+export const removeAvatar=(version:number)=>request(`/account/avatar?expectedVersion=${version}`,accountSchema,mutationOptions('DELETE',{}));
+export const listSessions=(signal?:AbortSignal)=>request('/account/sessions',z.object({items:z.array(sessionSchema)}),{signal});
+export const revokeSessions=(id?:string)=>request(id?`/account/sessions/${encodeURIComponent(id)}`:'/account/sessions/revoke-others',z.object({ok:z.boolean(),currentRevoked:z.boolean()}),mutationOptions(id?'DELETE':'POST',{}));
+export const getHistory=(signal?:AbortSignal)=>request('/account/history',z.object({items:z.array(historySchema)}),{signal});
+export const setupMfa=(password:string)=>request('/account/mfa/setup',setupSchema,mutationOptions('POST',{password}));
+export const confirmMfa=(code:string)=>request('/account/mfa/confirm',factorResultSchema,mutationOptions('POST',{code}));
+export const changeMfa=(action:'disable'|'recovery-codes',body:{password:string;code:string})=>request(`/account/mfa/${action}`,factorResultSchema,mutationOptions('POST',body));
+export const changePassword=(body:{password:string;newPassword:string;code?:string})=>request('/account/password',z.object({ok:z.boolean()}),mutationOptions('POST',body));

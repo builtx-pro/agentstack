@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {mkdtempSync,writeFileSync,readFileSync,realpathSync,rmSync,statSync,symlinkSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+const helper=resolve('tools/setup/configure-vps.py');
+function fixture(){const root=mkdtempSync(join(realpathSync(tmpdir()),'agentstack-vps-config-'));writeFileSync(join(root,'.agentstack-installer'),'agentstack-vps-v1\n');writeFileSync(join(root,'.env'),"APP_ORIGIN=https://review.example.com\nADMIN_EMAIL='owner@example.com'\nREPOSITORY_ENCRYPTION_KEY=synthetic-kept-value\n");return root;}
+function run(root,gateway){return spawnSync('python3',[helper,root,'review.example.com','owner@example.com',...(gateway?[gateway]:[])],{encoding:'utf8'});}
+test('config is repeatable, keeps credentials and trusts exactly one gateway',()=>{const root=fixture();try{assert.equal(run(root,'172.20.0.1').status,0);const first=readFileSync(join(root,'.env'),'utf8');assert.match(first,/REPOSITORY_ENCRYPTION_KEY=synthetic-kept-value/);assert.match(first,/TRUST_PROXY=172.20.0.1/);assert.equal(run(root,'172.20.0.1').status,0);assert.equal(readFileSync(join(root,'.env'),'utf8'),first);assert.equal(statSync(join(root,'.env')).mode&0o777,0o600);assert.match(readFileSync(join(root,'Caddyfile'),'utf8'),/header_up X-Forwarded-For \{remote_host\}/);}finally{rmSync(root,{recursive:true,force:true})}});
+test('invalid gateway and mismatched origin do not write anything',()=>{const root=fixture();try{const original=readFileSync(join(root,'.env'),'utf8');for(const gateway of ['0.0.0.0','172.20.0.0/16','8.8.8.8','true'])assert.notEqual(run(root,gateway).status,0);assert.equal(readFileSync(join(root,'.env'),'utf8'),original);writeFileSync(join(root,'.env'),original.replace('review.example.com','other.example.com'));assert.notEqual(run(root,'172.20.0.1').status,0);}finally{rmSync(root,{recursive:true,force:true})}});
+test('rejects symlink secrets and preserves operator Caddy edits',()=>{const root=fixture();try{writeFileSync(join(root,'Caddyfile'),'operator configuration');const original=readFileSync(join(root,'.env'),'utf8');assert.notEqual(run(root).status,0);assert.equal(readFileSync(join(root,'.env'),'utf8'),original);assert.equal(readFileSync(join(root,'Caddyfile'),'utf8'),'operator configuration');rmSync(join(root,'.env'));symlinkSync('/dev/null',join(root,'.env'));assert.notEqual(run(root).status,0);}finally{rmSync(root,{recursive:true,force:true})}});

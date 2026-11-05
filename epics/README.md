@@ -17,5 +17,6 @@
 | EPIC-011 | Migrate the existing concepts workspace | 🔵 review | M4 | 0/2 |
 | EPIC-012 | Public project and contribution workflow | 🔵 review | M4 | 0/2 |
 | EPIC-013 | Connect repositories and review synchronized work | 🔵 review | M5 | 0/4 |
+| EPIC-014 | Personal workspace and guided adoption | 🔵 review | M6 | 3/4 |
 
-_Эпиков: 13. Статусы: backlog → ready → in-progress → review → done; blocked — флаг._
+_Эпиков: 14. Статусы: backlog → ready → in-progress → review → done; blocked — флаг._

@@ -4,3 +4,6 @@
 .footer { margin-top: auto; padding-top: 4px; }
 .button { height: auto; min-height: 36px; padding-block: 8px; }
 .button :global(.mantine-Button-label) { white-space: normal; text-align: left; overflow-wrap: anywhere; }
+
+.tag {cursor:pointer;text-decoration:none;text-transform:none;}
+.tag:hover {background:var(--mantine-color-violet-light);color:var(--mantine-color-violet-light-color);}

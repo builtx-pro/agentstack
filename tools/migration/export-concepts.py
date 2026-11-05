@@ -75,6 +75,10 @@ def export_project(source, output, snapshot, slug, name, preview_base, rendered_
     originals=read_json(source/'prototypes/ui/_shared/screens.json')['screens']
     assets=read_json(source/'prototypes/assets/catalog.json')['items']
     screens={item['id']:item for item in originals+catalog['screens']}
+    ordered_ids=list(dict.fromkeys(sid for flow in catalog['flows'] for sid in flow.get('steps',[])+flow.get('states',[]) if sid in screens))
+    ordered_set=set(ordered_ids)
+    ordered_ids.extend(sid for sid in screens if sid not in ordered_set)
+    screen_order={sid:index for index,sid in enumerate(ordered_ids)}
     comments,events=read_snapshot(snapshot)
     objects=[];files={};orphans=[];missing=[];screen_keys=set()
     rendered={};render_root=None
@@ -113,7 +117,7 @@ def export_project(source, output, snapshot, slug, name, preview_base, rendered_
         for palette in sorted(palettes.get(variant,{''})):
             for screen_id,item in screens.items():
                 key=f'{screen_id}:{variant}:{palette}';screen_keys.add(key)
-                data={'screenId':screen_id,'variant':variant,'palette':palette,'frame':item.get('frame','mobile'),
+                data={'order':screen_order[screen_id],'screenId':screen_id,'variant':variant,'palette':palette,'frame':item.get('frame','mobile'),
                       'sourcePath':f'prototypes/ui/{folder}/screens/{screen_id}.html'}
                 if not palette:
                     filekey=register_file(f'prototypes/ui/{folder}/png/{screen_id}.png')
@@ -126,11 +130,11 @@ def export_project(source, output, snapshot, slug, name, preview_base, rendered_
                 if preview_base:
                     data['previewUrl']=preview_base.rstrip('/')+'/'+data['sourcePath']+(('?palette='+quote(palette)) if palette else '')
                 objects.append(draft(key,'screen',item['title'],data,description=item.get('description',item.get('must','')),tags=item.get('tags',[])))
-            for flow in catalog['flows']:
+            for flow_order,flow in enumerate(catalog['flows']):
                 keys=[f'{sid}:{variant}:{palette}' for sid in flow.get('steps',[]) if sid in screens]
                 states=[f'{sid}:{variant}:{palette}' for sid in flow.get('states',[]) if sid in screens]
                 objects.append(draft(f"flow:{flow['id']}:{variant}:{palette}",'flow',flow['title'],
-                    {'screenIds':list(dict.fromkeys(keys)),'stateIds':list(dict.fromkeys(states)),'role':flow.get('role',''),'phase':flow.get('phase','')},
+                    {'order':flow_order,'screenIds':list(dict.fromkeys(keys)),'stateIds':list(dict.fromkeys(states)),'role':flow.get('role',''),'phase':flow.get('phase','')},
                     description=flow.get('description',''),tags=[variant]+([palette] if palette else [])))
     if set(rendered)-screen_keys:raise ValueError('Rendered mapping includes unknown screen keys')
     asset_ids=set()

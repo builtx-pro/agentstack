@@ -5,6 +5,7 @@ export async function loginFromStdin(
   email: string | undefined,
   passwordStdin: boolean | undefined,
   timeoutMs?: number,
+  mfaStdin = false,
 ) {
   if (!baseUrl || !email || !passwordStdin)
     throw new Error(
@@ -24,10 +25,32 @@ export async function loginFromStdin(
     chunks.push(bytes);
   }
   const buffer = Buffer.concat(chunks);
-  const password = buffer.toString("utf8").replace(/\r?\n$/, "");
+  const input = buffer.toString("utf8").replace(/\r?\n$/, "");
   buffer.fill(0);
   for (const chunk of chunks) chunk.fill(0);
-  if (!password || /[\r\n]/.test(password))
-    throw new Error("Password input must contain exactly one nonempty line.");
-  return createHumanSession({ baseUrl, email, password, timeoutMs });
+  const { password, mfaCode } = parseHumanInput(input, mfaStdin);
+  return createHumanSession({ baseUrl, email, password, mfaCode, timeoutMs });
+}
+
+export function parseHumanInput(input: string, mfaStdin = false) {
+  const lines = input.split(/\r?\n/);
+  if (
+    lines.length !== (mfaStdin ? 2 : 1) ||
+    !lines[0] ||
+    lines.some((line) => line.includes("\r"))
+  )
+    throw new Error(
+      mfaStdin
+        ? "Input must contain exactly two lines: password, then verification code."
+        : "Password input must contain exactly one nonempty line.",
+    );
+  if (
+    mfaStdin &&
+    (!lines[1] || lines[1].trim().length < 6 || lines[1].trim().length > 40)
+  )
+    throw new Error("Verification code must contain 6–40 characters.");
+  return {
+    password: lines[0],
+    ...(mfaStdin ? { mfaCode: lines[1]!.trim() } : {}),
+  };
 }

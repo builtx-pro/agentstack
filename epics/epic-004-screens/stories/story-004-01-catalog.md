@@ -35,3 +35,7 @@ As a developer, I want to import a manifest and search flows/tags, so that I rev
 ## Implementation evidence
 
 The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.
+
+## Follow-up: ordering, tags and languages
+
+The [catalog navigation and language contract](../../../docs/product/catalog-and-locales.md) tracks source ordering, discoverability of alternate states, clickable tags and RU/EN interface support. Implementation and verification are in progress; these follow-ups do not change existing acceptance or archive semantics.

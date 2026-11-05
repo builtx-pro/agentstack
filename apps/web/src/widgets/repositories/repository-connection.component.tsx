@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { useState } from "react";
 import {
   Alert,
@@ -31,7 +32,7 @@ export function RepositoryConnection({
   connection: Repository;
   isAdmin: boolean;
   onPreview: (id: string) => void;
-}) {
+}) {const {t,locale}=useI18n();
   const actions = useRepositoryActions(projectId);
   const snapshots = useSnapshots(projectId, connection.id, true);
   const [token, setToken] = useState("");
@@ -71,30 +72,24 @@ export function RepositoryConnection({
           </div>
           <Badge color={connection.archived ? "gray" : "violet"}>
             {connection.archived
-              ? "Archived"
+              ? t("Archived")
               : connection.provider === "local"
-                ? "CLI / CI"
-                : "Web sync"}
+                ? t("CLI / CI")
+                : t("Web sync")}
           </Badge>
         </Group>
-        <Text size="xs" c="dimmed" className={classes.path}>
-          ID: {connection.id} · Roots: {connection.roots.join(", ")} ·
-          Connection v{connection.version}
+        <Text size="xs" c="dimmed" className={classes.path}>{t('Connection {id} · Paths: {paths} · Version {version}',{id:connection.id,paths:connection.roots.join(', '),version:connection.version})}
         </Text>
         {snapshots.data?.items[0] && (
-          <Text size="sm">
-            Latest snapshot: {snapshots.data.items[0].commit.slice(0, 12)} ·{" "}
-            {new Date(snapshots.data.items[0].createdAt).toLocaleString()}
+          <Text size="sm">{t('Latest snapshot: {commit}',{commit:snapshots.data.items[0].commit.slice(0, 12)})} ·{" "}
+            {new Date(snapshots.data.items[0].createdAt).toLocaleString(locale)}
           </Text>
         )}
         {connection.provider === "local" && !connection.archived && (
-          <Alert color="gray">
-            Local checkouts are reported by your CLI or CI. The server does not
-            execute repository scripts or read your computer.
-          </Alert>
+          <Alert color="gray">{t("Local checkouts are reported by your CLI or CI. The server does not execute repository scripts or read your computer.")}</Alert>
         )}
         {error && <Alert color="red">{repositoryError(error)}</Alert>}
-        {message && <Alert color="teal">{message}</Alert>}
+        {message && <Alert color="teal">{t(message)}</Alert>}
         <Group>
           {isAdmin && !connection.archived && (
             <Button
@@ -107,9 +102,7 @@ export function RepositoryConnection({
                   roots: connection.roots.join("\n"),
                 });
               }}
-            >
-              Edit connection settings
-            </Button>
+            >{t("Edit connection settings")}</Button>
           )}
           {!connection.archived && connection.provider !== "local" && (
             <Button
@@ -124,9 +117,7 @@ export function RepositoryConnection({
                   .then((snapshot) => onPreview(snapshot.id))
                   .catch(() => {})
               }
-            >
-              Fetch and preview
-            </Button>
+            >{t("Fetch and preview")}</Button>
           )}
           {isAdmin && (
             <Button
@@ -138,51 +129,45 @@ export function RepositoryConnection({
               }
             >
               {connection.archived
-                ? "Restore connection"
-                : "Archive connection"}
+                ? t("Restore connection")
+                : t("Archive connection")}
             </Button>
           )}
         </Group>
         <>
           {snapshots.error ? (
-            <Alert color="orange">
-              Snapshot history is unavailable.{" "}
+            <Alert color="orange">{t("Snapshot history is unavailable.")}{" "}
               <Button
                 size="xs"
                 variant="subtle"
                 onClick={() => void snapshots.refetch()}
-              >
-                Reload snapshots
-              </Button>
+              >{t("Reload snapshots")}</Button>
             </Alert>
           ) : snapshots.data?.items.length ? (
             <Stack gap="xs">
               {snapshots.data.items.map((snapshot) => (
                 <Group key={snapshot.id} justify="space-between">
                   <Text size="sm">
-                    {snapshot.commit.slice(0, 12)} · {snapshot.entryCount}{" "}
-                    entries ·{" "}
-                    {snapshot.source === "provider" ? "Provider" : "Reported"}
+                    {snapshot.commit.slice(0, 12)} · {t('Entries: {count}',{count:snapshot.entryCount})} ·{" "}
+                    {snapshot.source === "provider" ? t("Provider") : t("Reported")}
                   </Text>
                   <Button
                     size="compact-xs"
                     variant="subtle"
                     onClick={() => onPreview(snapshot.id)}
-                  >
-                    Review snapshot
-                  </Button>
+                  >{t("Review snapshot")}</Button>
                 </Group>
               ))}
             </Stack>
           ) : (
             <Text size="sm" c="dimmed">
-              {snapshots.isPending ? "Loading snapshots…" : "No snapshots yet."}
+              {snapshots.isPending ? t("Loading snapshots…") : t("No snapshots yet.")}
             </Text>
           )}
           {isAdmin && !connection.archived && (
             <>
               <Switch
-                label="Share pipeline status with customers"
+                label={t("Share pipeline status with customers")}
                 checked={connection.sharePipelines}
                 disabled={actions.patch.isPending}
                 onChange={(event) =>
@@ -195,12 +180,12 @@ export function RepositoryConnection({
                 <>
                   <Text size="xs" c="dimmed">
                     {connection.hasCredential
-                      ? "A provider token is stored. Its value is never returned."
-                      : "No provider token stored. Public repositories may work without one."}
+                      ? t("A provider token is stored. Its value is never returned.")
+                      : t("No provider token stored. Public repositories may work without one.")}
                   </Text>
                   <PasswordInput
-                    label={`New token for ${connection.label}`}
-                    description="Write-only. Cleared after every submission, including errors."
+                    label={t('New token for {name}',{name:connection.label})}
+                    description={t("Write-only. Cleared after every submission, including errors.")}
                     autoComplete="new-password"
                     value={token}
                     onChange={(event) => setToken(event.currentTarget.value)}
@@ -216,9 +201,7 @@ export function RepositoryConnection({
                         setToken("");
                         void patch({ token: value }).catch(() => {});
                       }}
-                    >
-                      Replace token
-                    </Button>
+                    >{t("Replace token")}</Button>
                     {connection.hasCredential && (
                       <Button
                         size="xs"
@@ -229,9 +212,7 @@ export function RepositoryConnection({
                           setToken("");
                           void patch({ token: null }).catch(() => {});
                         }}
-                      >
-                        Remove provider token
-                      </Button>
+                      >{t("Remove provider token")}</Button>
                     )}
                   </Group>
                 </>
@@ -243,45 +224,40 @@ export function RepositoryConnection({
       <Modal
         opened={!!edit}
         onClose={() => setEdit(null)}
-        title="Edit connection settings"
-        closeButtonProps={{ "aria-label": "Close connection settings" }}
+        title={t("Edit connection settings")}
+        closeButtonProps={{ "aria-label": t("Close connection settings") }}
       >
         {edit && (
           <Stack>
             <TextInput
-              label="Connection label"
+              label={t("Connection label")}
               value={edit.label}
               onChange={(event) =>
                 setEdit({ ...edit, label: event.currentTarget.value })
               }
             />
             <TextInput
-              label="Tracked branch"
+              label={t("Tracked branch")}
               value={edit.branch}
               onChange={(event) =>
                 setEdit({ ...edit, branch: event.currentTarget.value })
               }
             />
             <Textarea
-              label="Tracked paths"
+              label={t("Tracked paths")}
               minRows={4}
-              description="One relative Markdown file or directory per line."
+              description={t("One relative Markdown file or directory per line.")}
               value={edit.roots}
               onChange={(event) =>
                 setEdit({ ...edit, roots: event.currentTarget.value })
               }
             />
-            <Text size="sm" c="dimmed">
-              Existing snapshots stay in history. Fetch a new snapshot to use
-              these settings.
-            </Text>
+            <Text size="sm" c="dimmed">{t("Existing snapshots stay in history. Fetch a new snapshot to use these settings.")}</Text>
             {actions.patch.error && (
               <Alert color="red">{repositoryError(actions.patch.error)}</Alert>
             )}
             <Group justify="flex-end">
-              <Button variant="default" onClick={() => setEdit(null)}>
-                Cancel
-              </Button>
+              <Button variant="default" onClick={() => setEdit(null)}>{t("Cancel")}</Button>
               <Button
                 disabled={
                   !edit.label.trim() ||
@@ -301,9 +277,7 @@ export function RepositoryConnection({
                     .then(() => setEdit(null))
                     .catch(() => {})
                 }
-              >
-                Save connection settings
-              </Button>
+              >{t("Save connection settings")}</Button>
             </Group>
           </Stack>
         )}

@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { Alert, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { usePipelines } from "@units/repositories";
@@ -8,7 +9,7 @@ export function RepoSyncBanner({
 }: {
   projectId: string;
   canEdit: boolean;
-}) {
+}) {const {t}=useI18n();
   const query = usePipelines(projectId);
   if (!canEdit && !query.data?.items.length) return null;
   return (
@@ -16,11 +17,8 @@ export function RepoSyncBanner({
       <Stack gap="sm">
         <Group justify="space-between">
           <div>
-            <Title order={4}>Repository sync</Title>
-            <Text size="sm" c="dimmed">
-              Changes arrive as a preview. A person chooses what enters the
-              project.
-            </Text>
+            <Title order={4}>{t("Repository sync")}</Title>
+            <Text size="sm" c="dimmed">{t("Changes arrive as a preview. A person chooses what enters the project.")}</Text>
           </div>
           {canEdit && (
             <Link
@@ -38,25 +36,17 @@ export function RepoSyncBanner({
                 archived: false,
                 selected: "",
               }}
-            >
-              Review pending changes
-            </Link>
+            >{t("Review pending changes")}</Link>
           )}
         </Group>
         {query.error ? (
-          <Alert color="orange">
-            Pipeline status is unavailable. Project items are unchanged.
-          </Alert>
+          <Alert color="orange">{t("Pipeline status is unavailable. Project items are unchanged.")}</Alert>
         ) : query.isPending ? (
-          <Text size="sm" c="dimmed">
-            Loading pipeline status…
-          </Text>
+          <Text size="sm" c="dimmed">{t("Loading pipeline status…")}</Text>
         ) : query.data?.items.length ? (
           <Pipelines groups={query.data.items} />
         ) : (
-          <Text size="sm" c="dimmed">
-            Connect a repository or report a local checkout through CLI / CI.
-          </Text>
+          <Text size="sm" c="dimmed">{t("Connect a repository or report a local checkout through CLI / CI.")}</Text>
         )}
       </Stack>
     </Paper>

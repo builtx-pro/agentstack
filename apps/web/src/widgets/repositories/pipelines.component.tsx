@@ -1,3 +1,4 @@
+import {useI18n} from '@shared/i18n';
 import { Anchor, Badge, Group, Stack, Text } from "@mantine/core";
 import type { PipelineGroup } from "@units/repositories";
 const colors: Record<string, string> = {
@@ -17,7 +18,7 @@ function safeLink(url?: string) {
   } catch {}
   return;
 }
-export function Pipelines({ groups }: { groups: PipelineGroup[] }) {
+export function Pipelines({ groups }: { groups: PipelineGroup[] }) {const {t,locale}=useI18n();
   return (
     <Stack gap="md">
       {groups.map((group) => (
@@ -28,15 +29,15 @@ export function Pipelines({ groups }: { groups: PipelineGroup[] }) {
             </Text>
             <Text size="xs" c="dimmed">
               {group.lastCheckedAt
-                ? `Checked ${new Date(group.lastCheckedAt).toLocaleString()}`
-                : "No sync yet"}
+                ? t('Checked {date}',{date:new Date(group.lastCheckedAt).toLocaleString(locale)})
+                : t("No sync yet")}
             </Text>
           </Group>
           <Group gap="sm" mt="xs">
             {group.pipelines.map((pipeline) => (
               <Group key={pipeline.id} gap={6}>
                 <Badge color={colors[pipeline.status]} variant="light">
-                  {pipeline.status}
+                  {t(pipeline.status)}
                 </Badge>
                 {safeLink(pipeline.url) ? (
                   <Anchor
@@ -52,16 +53,14 @@ export function Pipelines({ groups }: { groups: PipelineGroup[] }) {
                 )}
                 <Text size="xs" c="dimmed">
                   {pipeline.source === "reported"
-                    ? "Reported by CI / agent"
-                    : "From provider"}
+                    ? t("Reported by CI / agent")
+                    : t("From provider")}
                   {pipeline.commit ? ` · ${pipeline.commit.slice(0, 8)}` : ""}
                 </Text>
               </Group>
             ))}
             {!group.pipelines.length && (
-              <Text size="sm" c="dimmed">
-                No pipeline runs reported.
-              </Text>
+              <Text size="sm" c="dimmed">{t("No pipeline runs reported.")}</Text>
             )}
           </Group>
         </div>

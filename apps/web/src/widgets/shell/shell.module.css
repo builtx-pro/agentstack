@@ -11,3 +11,5 @@
 .footer { margin-top:auto; padding:20px 12px 0; }
 @media(max-width: 62em){.layout{grid-template-columns:200px minmax(0,1fr)}.sidebar{padding-inline:10px}.header{padding-inline:20px}.main{padding:24px 20px}.nav{gap:8px;padding-inline:10px}}
 @media(max-width:48em){.layout{display:block}.sidebar{display:none}.header{height:68px;padding-inline:16px}.mobileNav{display:block;padding:12px 16px;background:var(--app-panel);border-bottom:1px solid var(--app-border)}.main{padding:24px 16px}.brand{font-size:19px}}
+
+@media(max-width: 400px){.header{gap:8px;padding-inline:12px}.brand{font-size:17px;gap:6px}.brandIcon{width:30px;height:30px}}

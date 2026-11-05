@@ -51,18 +51,102 @@ describe("explicit human CLI session", () => {
   });
   it("keeps login bounded while forwarding an extended request timeout to the human client", async () => {
     const timeout = vi.spyOn(AbortSignal, "timeout");
-    const fetch = vi.fn(async (url: unknown) => String(url).endsWith("/auth/login")
-      ? Response.json({}, {headers: {"Set-Cookie": "agentstack_session=synthetic-session; HttpOnly"}})
-      : Response.json(String(url).endsWith("/auth/logout") ? {ok: true} : {items: [], nextCursor: null}));
-    const session = await createHumanSession({baseUrl: "http://127.0.0.1:4300", email: "operator@example.test", password: "synthetic-input-only", timeoutMs: 120000, fetch});
+    const fetch = vi.fn(async (url: unknown) =>
+      String(url).endsWith("/auth/login")
+        ? Response.json(
+            {},
+            {
+              headers: {
+                "Set-Cookie": "agentstack_session=synthetic-session; HttpOnly",
+              },
+            },
+          )
+        : Response.json(
+            String(url).endsWith("/auth/logout")
+              ? { ok: true }
+              : { items: [], nextCursor: null },
+          ),
+    );
+    const session = await createHumanSession({
+      baseUrl: "http://127.0.0.1:4300",
+      email: "operator@example.test",
+      password: "synthetic-input-only",
+      timeoutMs: 120000,
+      fetch,
+    });
     await session.client.projects();
     await session.logout();
-    expect(timeout.mock.calls.map(call => call[0])).toEqual([30000, 120000, 120000]);
+    expect(timeout.mock.calls.map((call) => call[0])).toEqual([
+      30000, 120000, 120000,
+    ]);
   });
-  it.each([0, -1, 1.5, 600001, Infinity, NaN])("rejects invalid human request timeout %s before authenticating", async timeoutMs => {
-    const fetch = vi.fn();
-    await expect(createHumanSession({baseUrl: "http://127.0.0.1:4300", email: "operator@example.test", password: "synthetic-input-only", timeoutMs, fetch})).rejects.toThrow();
-    expect(fetch).not.toHaveBeenCalled();
-  });
+  it.each([0, -1, 1.5, 600001, Infinity, NaN])(
+    "rejects invalid human request timeout %s before authenticating",
+    async (timeoutMs) => {
+      const fetch = vi.fn();
+      await expect(
+        createHumanSession({
+          baseUrl: "http://127.0.0.1:4300",
+          email: "operator@example.test",
+          password: "synthetic-input-only",
+          timeoutMs,
+          fetch,
+        }),
+      ).rejects.toThrow();
+      expect(fetch).not.toHaveBeenCalled();
+    },
+  );
 
+  it("requires an explicit factor and completes a bounded second login step", async () => {
+    const challenge = "x".repeat(43);
+    const fetch = vi.fn(async (url: unknown, init?: RequestInit) => {
+      if (String(url).endsWith("/auth/login"))
+        return Response.json({
+          mfaRequired: true,
+          challenge,
+          expiresAt: new Date(Date.now() + 300000).toISOString(),
+        });
+      if (String(url).endsWith("/auth/mfa/verify")) {
+        expect(JSON.parse(String(init?.body))).toEqual({
+          challenge,
+          code: "123456",
+        });
+        return Response.json(
+          { user: {} },
+          {
+            headers: {
+              "Set-Cookie": "agentstack_session=mfa-session; HttpOnly",
+            },
+          },
+        );
+      }
+      return Response.json({ ok: true });
+    });
+    await expect(
+      createHumanSession({
+        baseUrl: "http://localhost:4300",
+        email: "operator@example.test",
+        password: "private",
+        fetch,
+      }),
+    ).rejects.toMatchObject({ code: "mfa_required" });
+    const session = await createHumanSession({
+      baseUrl: "http://localhost:4300",
+      email: "operator@example.test",
+      password: "private",
+      mfaCode: "123456",
+      fetch,
+    });
+    await session.logout();
+  });
+  it("bounds unexpected login challenge response bodies", async () => {
+    await expect(
+      createHumanSession({
+        baseUrl: "http://localhost:4300",
+        email: "operator@example.test",
+        password: "private",
+        fetch: async () => new Response("x".repeat(40000)),
+      }),
+    ).rejects.toMatchObject({ code: "response_too_large" });
+  });
 });

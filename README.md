@@ -26,11 +26,17 @@ Saving a comment does not launch an LLM or spend provider credits. AgentStack co
 | Knowledge | Markdown documents, agent rules, editable checklists, history and restoration |
 | Planning | Waves, epics, sprints, stories, features and proposals converted into work |
 | Progress | Counts from actual stories, group progress, historical scope and activity |
+| Account | Profile and avatar, RU/EN, personal accent, light/dark/system theme, password, sessions and optional authenticator MFA |
+| Onboarding | First-login introduction, 11 practical chapters and a checklist based on real project materials |
 | Access | Multiple private projects, administrator/developer/customer roles and scoped expiring tokens |
 | History | Immutable revision records, archive/unarchive, optimistic conflicts and content restoration |
 | Agents | TypeScript SDK, CLI, stdio MCP, portable context and agent recipes |
 
 The public repository contains the engine and a fictional starter project. Your imported screenshots, comments, credentials and customer data stay in your deployment.
+
+## Install on a VPS
+
+For a clean Ubuntu/Debian VPS, the [one-command installer](docs/runbooks/vps-one-command.md) configures Docker, the first administrator, your domain and automatic HTTPS. It pins the source commit, preserves interrupted-install state and refuses to overwrite existing deployments. No host Node.js installation is required.
 
 ## Quick start
 

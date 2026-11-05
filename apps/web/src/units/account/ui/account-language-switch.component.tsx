@@ -1,0 +1,5 @@
+import {Button,Stack,Text} from '@mantine/core';
+import {notifications} from '@mantine/notifications';
+import {LanguageSwitch,useI18n,type Locale} from '@shared/i18n';
+import {useAccount,useAccountActions} from '../service/use-account.hook';
+export function AccountLanguageSwitch(){const {t,setLocale}=useI18n();const account=useAccount();const actions=useAccountActions(account.data?.user.id??'');const choose=(locale:Locale)=>{setLocale(locale);if(!account.data)return;actions.patch.mutate({expectedVersion:account.data.version,preferences:{locale}},{onError:()=>{void account.refetch();notifications.show({color:'orange',title:t('Language saved on this device'),message:<Stack gap="xs"><Text size="sm">{t('Account sync failed. Your language choice is still active here.')}</Text><Button size="xs" variant="light" onClick={()=>void account.refetch().then(result=>{if(result.data)actions.patch.mutate({expectedVersion:result.data.version,preferences:{locale}});})}>{t('Try again')}</Button></Stack>});}});};return <LanguageSwitch onChange={choose} disabled={account.isPending||actions.patch.isPending}/>;}

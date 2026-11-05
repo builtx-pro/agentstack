@@ -1,4 +1,6 @@
 const messages: Record<string, string> = {
+  mfa_required:
+    "This account requires a verification code. Supply mfaCode in the SDK, or --mfa-stdin with a second protected input line in the CLI.",
   unauthorized: "Authentication failed. Check or rotate the configured token.",
   forbidden: "This operation is not permitted by the current credentials.",
   not_found: "The requested resource is unavailable.",
@@ -18,7 +20,8 @@ const messages: Record<string, string> = {
   pagination_limit:
     "The collection page limit was reached. Narrow the query or explicitly raise the limit.",
   network_error: "The server could not be reached securely.",
-  repository_snapshot_too_large: "The repository snapshot is too large. Narrow its configured roots before retrying.",
+  repository_snapshot_too_large:
+    "The repository snapshot is too large. Narrow its configured roots before retrying.",
   timeout: "The request timed out.",
 };
 export class AgentStackError extends Error {
