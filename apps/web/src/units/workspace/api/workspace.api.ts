@@ -3,7 +3,7 @@ import { collection,request,mutationOptions } from '@shared/api/client';
 import { projectSchema,objectSchema,noteSchema,revisionSchema,activitySchema,progressSchema } from '@shared/api/schemas';
 export const getProjects=(signal?:AbortSignal)=>collection('/projects',projectSchema,signal);
 export const getProject=(id:string,signal?:AbortSignal)=>request(`/projects/${id}`,projectSchema,{signal});
-export const getObjects=(id:string,signal?:AbortSignal)=>collection(`/projects/${id}/objects?archived=all`,objectSchema,signal);
+export const getObjects=(id:string,signal?:AbortSignal)=>collection(`/projects/${id}/objects?archived=all`,objectSchema,signal,1000);
 export const getNotes=async(id:string,targetId?:string,signal?:AbortSignal)=>(await collection(`/projects/${id}/notes${targetId?`?targetId=${targetId}`:''}`,noteSchema,signal)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
 export const getHistory=async(id:string,target:string,signal?:AbortSignal)=>(await collection(`/projects/${id}/objects/${target}/history`,revisionSchema,signal)).sort((a,b)=>b.version-a.version);
 export const getActivity=async(id:string,signal?:AbortSignal)=>(await collection(`/projects/${id}/activity`,activitySchema,signal)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));

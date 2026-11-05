@@ -132,6 +132,17 @@ afterAll(async () => {
   if (storage) await rm(storage, { recursive: true, force: true });
 });
 describe("authorization and sessions", () => {
+  it("bounds larger catalog pages without widening other lists or customer access", async () => {
+    const visible = await createObject("screen", "Bulk page visible", {screenId:"bulk-visible"});
+    const hidden = await createObject("document", "Bulk page hidden", {markdown:"Team only"}, "team");
+    const response = await req("GET", `/projects/${pid}/objects?limit=1000`, undefined, customer);
+    expect(response.statusCode, response.body).toBe(200);
+    expect(response.json().items.some((item: {id:string}) => item.id === visible.id)).toBe(true);
+    expect(response.json().items.some((item: {id:string}) => item.id === hidden.id)).toBe(false);
+    expect((await req("GET", `/projects/${pid}/objects?limit=1001`)).statusCode).toBe(400);
+    expect((await req("GET", "/projects?limit=101")).statusCode).toBe(400);
+    expect((await req("GET", `/projects/${pid2}/objects?limit=1000`, undefined, customer)).statusCode).toBe(404);
+  });
   it("returns only permitted projects and hides foreign IDs", async () => {
     expect(
       (await req("GET", "/projects", undefined, developer))

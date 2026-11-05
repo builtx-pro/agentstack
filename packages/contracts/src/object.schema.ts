@@ -182,5 +182,9 @@ export const listQuerySchema = z.object({
   archived: z.enum(["true", "false", "all"]).default("false"),
   targetId: idSchema.optional(),
 });
+// Catalog pages are bounded separately; other API collections retain the 100-row cap.
+export const objectListQuerySchema = listQuerySchema.extend({
+  limit: z.coerce.number().int().min(1).max(1000).default(50),
+});
 export const listSchema = <T extends z.ZodType>(schema: T) =>
   z.object({ items: z.array(schema), nextCursor: z.string().nullable() });

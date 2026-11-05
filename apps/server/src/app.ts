@@ -32,6 +32,7 @@ import {
   objectPatchSchema,
   restoreSchema,
   listQuerySchema,
+  objectListQuerySchema,
   noteDraftSchema,
   notePatchSchema,
   noteTransitionSchema,
@@ -475,7 +476,7 @@ export async function buildApp(config: ServerConfig) {
     ),
   );
   app.get(prefix + "/projects/:projectId/objects", (r) =>
-    inProject(r, "read", (ctx) => objects.listObjects(ctx, query(r))),
+    inProject(r, "read", (ctx) => objects.listObjects(ctx, parse(objectListQuerySchema, r.query))),
   );
   app.post(prefix + "/projects/:projectId/objects", async (r, reply) => {
     const draft = parse(objectDraftSchema, r.body);

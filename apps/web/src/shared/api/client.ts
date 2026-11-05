@@ -6,9 +6,9 @@ export async function request<T>(path:string,schema:z.ZodType<T>,options:Request
  if(response.status===204)return schema.parse(undefined);
  return schema.parse(await response.json());
 }
-export async function collection<T>(path:string,schema:z.ZodType<T>,signal?:AbortSignal):Promise<T[]> {
+export async function collection<T>(path:string,schema:z.ZodType<T>,signal?:AbortSignal,pageSize=100):Promise<T[]> {
  const result:T[]=[];let cursor:string|undefined;const seen=new Set<string>();
- do {const delimiter=path.includes('?')?'&':'?';const page=await request(`${path}${delimiter}limit=100${cursor?`&cursor=${encodeURIComponent(cursor)}`:''}`,z.object({items:z.array(schema),nextCursor:z.string().nullish()}),{signal});result.push(...page.items);cursor=page.nextCursor??undefined;if(cursor){if(seen.has(cursor)||seen.size>999)throw new Error('Pagination could not complete. Narrow the search.');seen.add(cursor);}}while(cursor);
+ do {const delimiter=path.includes('?')?'&':'?';const page=await request(`${path}${delimiter}limit=${pageSize}${cursor?`&cursor=${encodeURIComponent(cursor)}`:''}`,z.object({items:z.array(schema),nextCursor:z.string().nullish()}),{signal});result.push(...page.items);cursor=page.nextCursor??undefined;if(cursor){if(seen.has(cursor)||seen.size>999)throw new Error('Pagination could not complete. Narrow the search.');seen.add(cursor);}}while(cursor);
  return result;
 }
 export const jsonBody=(value:unknown)=>JSON.stringify(value);
