@@ -1,11 +1,11 @@
 ---
-id: STORY-013-02
-epic: EPIC-013
+id: STORY-014-02
+epic: EPIC-014
 title: Personalize and secure an account
 status: done
 blocked: false
 priority: must
-milestone: M4
+milestone: M6
 ---
 # Personalize and secure an account
 

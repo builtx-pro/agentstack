@@ -1,17 +1,17 @@
 ---
-id: STORY-013-03
-epic: EPIC-013
-title: Navigate a cohesive illustrated workspace
-status: done
+id: STORY-014-04
+epic: EPIC-014
+title: Install and learn the workspace
+status: review
 blocked: false
 priority: must
-milestone: M4
+milestone: M6
 ---
-# Navigate a cohesive illustrated workspace
+# Install and learn the workspace
 
 ## Acceptance
 
-Generated meaningful illustrations replace primary card glyphs; light/dark and accent choices remain readable.
+A clean supported VPS installation and role-aware guided onboarding meet the installation contract.
 
 Given an unauthorized actor or stale version, the operation fails without disclosing data or losing concurrent changes.
 
@@ -22,5 +22,7 @@ Given an unauthorized actor or stale version, the operation fails without disclo
 - [x] Documentation, deployment and preservation evidence are recorded.
 
 [Detailed contract](../../../docs/product/workspace-experience.md)
+
+Clean systemd VPS/apt/public ACME execution remains unverified; see the release verification limits.
 
 [Release verification](../../../docs/releases/0.3.0-verification.md).

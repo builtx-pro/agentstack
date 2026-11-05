@@ -1,10 +1,10 @@
 ---
-id: EPIC-013
+id: EPIC-014
 title: Personal workspace and guided adoption
 status: review
 blocked: false
 priority: must
-milestone: M4
+milestone: M6
 ---
 # Personal workspace and guided adoption
 
