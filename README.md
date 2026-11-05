@@ -82,7 +82,7 @@ Backend tests create an isolated PostgreSQL container. See [CONTRIBUTING.md](CON
 
 ## Release status and boundaries
 
-Repository integration adds GitHub/GitLab connections, reviewed Markdown imports, CLI/CI synchronization and pipeline summaries. See [the repository guide](docs/agents/repository-sync.md) for setup and limits.
+Repository integration adds GitHub/GitLab connections, reviewed Markdown imports, CLI/CI synchronization and pipeline summaries. See [the repository guide](docs/agents/repository-sync.md) for setup and limits and [0.2.0 verification](docs/releases/0.2.0-verification.md) for observed checks.
 
 The 0.1.0 implementation has passed the [recorded release checks](docs/releases/0.1.0-verification.md), including a verified private production migration. Project-specific evidence and credentials remain outside this public repository.
 

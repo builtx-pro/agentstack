@@ -18,6 +18,8 @@ Permission isolation, credential round trip/tamper failure, provider redirects/e
 - [x] Agree scope and API contract.
 - [x] Implement behavior and failure paths.
 - [x] Run meaningful tests and applicable browser checks.
-- [ ] Update operator/agent documentation and verify deployed behavior.
+- [x] Update operator/agent documentation and verify deployed behavior.
 
 [Specification](../../../docs/product/repository-integration.md)
+
+[Verified release checks](../../../docs/releases/0.2.0-verification.md). Status remains review pending human acceptance.
