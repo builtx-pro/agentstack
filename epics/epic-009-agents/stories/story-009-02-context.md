@@ -1,0 +1,32 @@
+---
+id: STORY-009-02
+epic: EPIC-009
+title: Export portable agent context
+status: backlog
+blocked: false
+priority: must
+milestone: M3
+---
+# STORY-009-02: Export portable agent context
+
+As a developer, I want to copy a task bundle and use CLI recipes, so that LLMs without MCP can still help.
+
+## Acceptance
+- Given a review item and project rules, when context is exported, then it includes target/revision/criteria and excludes secrets.
+- Given an unauthorized project or hidden target, when the operation is attempted through any exposed adapter, then it is rejected without disclosing content.
+
+## Tasks
+- [ ] Inspect the contract and define behavioral cases.
+- [ ] Implement the vertical workflow and safe failure paths.
+- [ ] Verify API, browser or CLI behavior as appropriate.
+- [ ] Update the user/agent/operator documentation.
+
+## Definition of done
+- [ ] Relevant tests and checks pass; no false completed claims.
+- [ ] Permissions, concurrency and history behavior are verified.
+- [ ] UI is keyboard accessible and checked at desktop/mobile widths when applicable.
+- [ ] Evidence and limitations are recorded.
+
+## References
+- [Specification](../../../docs/product/specification.md)
+- [Architecture](../../../docs/architecture/overview.md)
