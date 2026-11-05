@@ -2,7 +2,7 @@
 id: STORY-001-02
 epic: EPIC-001
 title: Back up and restore an instance
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M1
@@ -31,3 +31,7 @@ As a operator, I want to restore database and files, so that an upgrade does not
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

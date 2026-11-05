@@ -1,0 +1,10 @@
+.hero { background:light-dark(#f0edff,#25203c);border:1px solid light-dark(#e6e0fb,#3e335d);border-radius:20px;padding:28px; }
+.stat { border:1px solid var(--app-border);background:var(--app-panel);padding:22px;border-radius:16px; }
+.statValue { font-size:30px;font-weight:700;letter-spacing:-1px;margin-top:12px; }
+.chart { width:100%;height:180px;overflow:visible; }
+.line { fill:none;stroke:var(--mantine-color-violet-5);stroke-width:3;stroke-linecap:round;stroke-linejoin:round; }
+.scopeLine { fill:none;stroke:var(--mantine-color-gray-5);stroke-width:2;stroke-dasharray:5 6; }
+.gridLine { stroke:var(--app-border);stroke-width:1; }
+
+.doneMarker { fill: var(--mantine-color-violet-5); stroke: var(--app-panel); stroke-width:2; }
+.scopeMarker { fill:var(--mantine-color-gray-4); stroke:var(--app-panel); stroke-width:2; }

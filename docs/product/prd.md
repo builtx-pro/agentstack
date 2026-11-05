@@ -29,4 +29,4 @@ No baseline speed measurements exist. Track observed time from comment to ready-
 Untrusted preview code; accidental publication of private assets; conflicting edits; false completion claims; double-counted progress; archive/history exposing formerly shared material. See the specification and security model for controls.
 
 ## Decisions delegated by owner
-Custom Mantine UI, monorepo, flexible safe access, additional useful features and technical implementation are delegated. Product name AgentStack confirmed. License choice pending; no licensing claim until confirmed.
+Custom Mantine UI, monorepo, flexible safe access, additional useful features and technical implementation are delegated. Product name AgentStack confirmed. Apache-2.0 is the announced default for the original engine and synthetic templates; imported project content keeps its own rights.

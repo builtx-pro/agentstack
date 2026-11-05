@@ -12,3 +12,6 @@ backups/
 .DS_Store
 *.sqlite*
 *.log
+
+__pycache__/
+*.pyc

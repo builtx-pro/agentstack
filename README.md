@@ -1,22 +1,91 @@
 # AgentStack
 
-One workspace for humans and coding agents: review screens and assets, leave precise feedback, maintain project knowledge and plan delivery.
+**Review what your coding agent builds. Give it precise feedback. Keep the whole project in view.**
 
-**Status: specification and implementation in progress. This is not yet a production release.**
+AgentStack is a self-hosted workspace for developers, designers, customers and coding agents. Arrange screens into flows, discuss a specific revision, review assets, edit project knowledge and track delivery in one place.
 
-AgentStack is self-hosted. Your projects and comments stay in your own deployment. The public repository contains the engine and synthetic examples, never customer material.
+[Русский](README.ru.md) · [Install](docs/runbooks/installation.md) · [Agent setup](docs/agents/README.md) · [Documentation](docs/README.md)
 
-## Product
+## The working loop
 
-- Screens arranged into user flows, searchable by title, identifier and tags.
-- Asset library with versions, usage references and discussions.
-- Comments attached to the exact object and revision, a shared agent queue, review evidence and human acceptance.
-- Documents and agent rules editable in the web UI, with version conflicts and history.
-- Waves, epics, stories, sprints, features and proposals with honest progress reporting.
-- Multiple projects, installation administrators, assigned developers and scoped customer access.
-- MCP and CLI through the same authenticated API.
-- Version history, comparisons, archive and restore without erasing audit records.
+1. Import screens, flows and illustrations, or add them in the browser.
+2. Open a screen: preview on the left, discussion on the right. Leave a concrete note on that revision.
+3. Ask your existing agent to read the project's rules and review queue through MCP or CLI.
+4. The agent claims an item, changes your source repository, runs checks and submits its evidence.
+5. Review the result, accept it or send it back. The comment, revisions and decision remain in history.
 
-Start with [the specification](docs/product/specification.md), [PRD](docs/product/prd.md), [roadmap](docs/product/roadmap.md) and [epics](epics/README.md).
+Saving a comment does not launch an LLM or spend provider credits. AgentStack coordinates your existing tools; it does not execute arbitrary project code on the server.
 
-Agent entry point: [AGENTS.md](AGENTS.md). Documentation map: [docs/README.md](docs/README.md).
+## What is included
+
+| Area | Workflow |
+| --- | --- |
+| Screens | Ordered user flows, alternative states, search, tags, variants, themes and shareable links |
+| Assets | Images and illustrations, protected files, used-by references, discussions and visual history |
+| Feedback | Revision-bound notes, expiring claims, evidence, human acceptance and reopening |
+| Knowledge | Markdown documents, agent rules, editable checklists, history and restoration |
+| Planning | Waves, epics, sprints, stories, features and proposals converted into work |
+| Progress | Counts from actual stories, group progress, historical scope and activity |
+| Access | Multiple private projects, administrator/developer/customer roles and scoped expiring tokens |
+| History | Immutable revision records, archive/unarchive, optimistic conflicts and content restoration |
+| Agents | TypeScript SDK, CLI, stdio MCP, portable context and agent recipes |
+
+The public repository contains the engine and a fictional starter project. Your imported screenshots, comments, credentials and customer data stay in your deployment.
+
+## Quick start
+
+Requirements: Docker with Compose, Git and Node.js 22.22 or later.
+
+```sh
+git clone https://github.com/builtx-pro/agentstack.git
+cd agentstack
+node tools/setup/init-env.mjs --email you@example.com
+docker compose up -d --build
+cat .data/bootstrap-password | docker compose run --rm -T bootstrap
+```
+
+Open [localhost:4311](http://localhost:4311). Sign in with your email and the unique password in `.data/bootstrap-password`. Store it privately. No shared default password exists.
+
+Create a project. In **Settings → Import**, select the `examples/starter` folder and `manifest.json`, review the dry run, then apply. The fictional recovery flow includes screens, an asset, rules and a small delivery plan.
+
+For HTTPS, backups, restoration and upgrades, follow the [operator guides](docs/runbooks/installation.md). The database is not exposed on a host port by the default Compose file.
+
+## Connect an agent
+
+Build the local SDK/CLI/MCP:
+
+```sh
+npm ci
+npm run build
+```
+
+Create a project token in Settings. Supply `AGENTSTACK_URL` and `AGENTSTACK_TOKEN` through your client's environment, not a committed configuration file. The stdio executable is `packages/mcp/dist/main.js`.
+
+[Client templates](agent-kit/clients/README.md) cover the common configuration shape. [Agent recipes](agent-kit/README.md) explain how to read context, respect leases, handle conflicts and submit results. A text context bundle works with models that cannot use MCP.
+
+Agents cannot accept their own results or silently change operating rules. The same API permissions apply to the browser, CLI and MCP.
+
+## Architecture and development
+
+TypeScript monorepo: React + custom Mantine theme, CSS Modules, TanStack Router/Query, Zod, Fastify and PostgreSQL. One application container, one database, immutable file storage. No Redis or Kubernetes requirement.
+
+```sh
+npm ci
+npm run build
+npm run typecheck
+npm test
+npm run test:migration
+npm run test:setup
+```
+
+Backend tests create an isolated PostgreSQL container. See [CONTRIBUTING.md](CONTRIBUTING.md), [AGENTS.md](AGENTS.md) and the [API contract](docs/api/contract.md).
+
+## Release status and boundaries
+
+This is the initial implementation candidate. Release verification and the first private production migration are being completed; do not interpret the roadmap as completed test evidence.
+
+MCP is stdio, not an OAuth-enabled remote MCP service. Git exchange is explicit import/export with version checks, not a background Git synchronizer. Preview URLs remain your responsibility; the embedded frame is sandboxed. No automatic agent runner, email delivery service or claimed productivity benchmark is bundled.
+
+## License
+
+[Apache-2.0](LICENSE) for the engine, templates and synthetic examples. Imported project materials retain their own ownership and licensing. See [NOTICE](NOTICE).

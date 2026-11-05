@@ -1,0 +1,40 @@
+# CLI reference
+
+Run from a built checkout: `node packages/cli/dist/main.js --help`. The CLI uses the same authenticated API as MCP. Supply `AGENTSTACK_URL`, `AGENTSTACK_TOKEN` and optionally `AGENTSTACK_PROJECT` through your environment. `--project <UUID>` overrides the project default; `--url` overrides the origin. Tokens have no command-line flag.
+
+```sh
+node packages/cli/dist/main.js doctor --json
+node packages/cli/dist/main.js projects --json
+node packages/cli/dist/main.js --project PROJECT_UUID context --markdown --output context.md
+node packages/cli/dist/main.js --project PROJECT_UUID objects list --kind screen --q recovery --json
+node packages/cli/dist/main.js --project PROJECT_UUID objects list --kind asset --tag illustration --json
+node packages/cli/dist/main.js --project PROJECT_UUID objects get OBJECT_UUID --json
+node packages/cli/dist/main.js --project PROJECT_UUID notes list --status open --json
+node packages/cli/dist/main.js --project PROJECT_UUID claim NOTE_UUID --version 1 --json
+node packages/cli/dist/main.js --project PROJECT_UUID submit NOTE_UUID result.json --version 2 --json
+node packages/cli/dist/main.js --project PROJECT_UUID release NOTE_UUID --version 2 --reason "Blocked by missing source" --json
+node packages/cli/dist/main.js --project PROJECT_UUID history OBJECT_UUID --json
+node packages/cli/dist/main.js --project PROJECT_UUID history NOTE_UUID --note --json
+node packages/cli/dist/main.js --project PROJECT_UUID progress --json
+```
+
+Replace uppercase UUID placeholders with actual identifiers. Note version and target version are different values. Always use the returned version after a mutation.
+
+`result.json`:
+
+```json
+{
+  "summary": "Clarified the recovery action and checked navigation.",
+  "revision": "your-actual-commit-sha",
+  "checks": [
+    { "name": "Recovery flow in browser", "result": "passed", "details": "Checked the changed button and destination." },
+    { "name": "Production release", "result": "not_run", "details": "This change is local only." }
+  ]
+}
+```
+
+The sample describes the format, not tests that were run for your project. Replace every result with actual evidence.
+
+Create/update use JSON files matching the API contract. `objects create` and `notes create` accept `--request-id UUID` for safe retry. `objects update` requires `expectedVersion` in the input. Rules and completed statuses remain server-restricted for agent tokens. There is intentionally no CLI command to accept a result using an agent token.
+
+`--json` emits machine JSON on stdout. Errors and upload-reconciliation warnings go to stderr; failure exits nonzero. Output files are created exclusively with owner-only permissions; an existing path is never silently overwritten.

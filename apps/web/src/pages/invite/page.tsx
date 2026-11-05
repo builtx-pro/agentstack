@@ -1,0 +1,6 @@
+import { Container,Paper,Stack,Title,TextInput,PasswordInput,Button,Alert,Anchor } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useMutation } from '@tanstack/react-query';
+import { request,mutationOptions } from '@shared/api/client';
+import { z } from 'zod';
+export function InvitePage(){const form=useForm({initialValues:{token:'',name:'',password:''},validate:{token:v=>v?null:'Paste your invitation',name:v=>v.trim()?null:'Enter your name',password:v=>v.length>=12?null:'Use at least 12 characters'}});const mutation=useMutation({mutationFn:(body:typeof form.values)=>request('/auth/accept-invitation',z.unknown(),mutationOptions('POST',body))});return <Container size={440} py={80}><Paper withBorder p="xl"><form onSubmit={form.onSubmit(values=>mutation.mutate(values))}><Stack><Title order={2}>Join your project</Title>{mutation.isSuccess?<Alert color="teal">Invitation accepted. <Anchor href="/login">Sign in</Anchor> to continue.</Alert>:<><TextInput label="Invitation token" required {...form.getInputProps('token')}/><TextInput label="Your name" required {...form.getInputProps('name')}/><PasswordInput label="Create a password" description="At least 12 characters" required {...form.getInputProps('password')}/><Button type="submit" loading={mutation.isPending}>Accept invitation</Button></>}</Stack></form></Paper></Container>;}

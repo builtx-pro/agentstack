@@ -2,7 +2,7 @@
 id: STORY-006-02
 epic: EPIC-006
 title: Claim and submit agent work
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M2
@@ -31,3 +31,7 @@ As a agent, I want to claim a task and submit evidence, so that multiple agents 
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

@@ -2,7 +2,7 @@
 id: STORY-007-02
 epic: EPIC-007
 title: Review proposed rule changes
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M3
@@ -31,3 +31,7 @@ As a developer, I want to review agent-proposed rule edits, so that untrusted fe
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

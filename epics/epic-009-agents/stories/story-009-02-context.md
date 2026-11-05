@@ -2,7 +2,7 @@
 id: STORY-009-02
 epic: EPIC-009
 title: Export portable agent context
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M3
@@ -30,3 +30,7 @@ As a developer, I want to copy a task bundle and use CLI recipes, so that LLMs w
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

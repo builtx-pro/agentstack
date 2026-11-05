@@ -1,7 +1,7 @@
 ---
 id: EPIC-006
 title: Feedback to verified result
-status: backlog
+status: review
 blocked: false
 milestone: M2
 owner: maintainers

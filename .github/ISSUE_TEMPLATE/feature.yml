@@ -1,0 +1,19 @@
+name: Feature proposal
+description: Explain the workflow you want to improve.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Whose work is difficult today, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What outcome would help?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and relevant constraints

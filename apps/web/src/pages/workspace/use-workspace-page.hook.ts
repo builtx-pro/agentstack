@@ -1,0 +1,8 @@
+import { useParams,useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
+import { WorkspaceService } from '@units/workspace';
+import { AuthService } from '@units/auth';
+import { useCatalogFilters } from '@units/catalog/service/use-catalog.hook';
+import type { ObjectKind,ProjectObject } from '@shared/api/schemas';
+import { sectionInfo,type Section } from '@shared/lib/labels.constant';
+export function useWorkspacePage(){const params=useParams({from:'/projects/$projectId/$section'});const projectId=params.projectId;const section=(params.section in sectionInfo?params.section:'overview') as Section;const navigate=useNavigate();const auth=AuthService.useAuth();const project=WorkspaceService.useProject(projectId,!!auth.data);const projects=WorkspaceService.useProjects(!!auth.data);const objects=WorkspaceService.useObjects(projectId,!!auth.data);const notes=WorkspaceService.useNotes(projectId,undefined,!!auth.data);const progress=WorkspaceService.useProgress(projectId,!!auth.data);const {filters,select}=useCatalogFilters();const [editor,setEditor]=useState<{kind:ObjectKind;object?:ProjectObject}|null>(null);const selected=objects.data?.find(o=>o.id===filters.selected);const canEdit=!!auth.data?.user.isAdmin||project.data?.role==='developer'||project.data?.role==='admin';const goSection=(next:string)=>void navigate({to:'/projects/$projectId/$section',params:{projectId,section:next},search:{q:'',tag:'',variant:'',palette:'',flow:'',status:'',kind:'',archived:false,selected:''}});return{projectId,section,auth,project,projects,objects,notes,progress,filters,select,selected,canEdit,editor,setEditor,goSection};}

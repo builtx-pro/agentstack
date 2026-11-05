@@ -2,7 +2,7 @@
 id: STORY-012-01
 epic: EPIC-012
 title: Use a synthetic starter project
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M4
@@ -31,3 +31,7 @@ As a newcomer, I want to run a complete safe demo and follow docs, so that I can
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

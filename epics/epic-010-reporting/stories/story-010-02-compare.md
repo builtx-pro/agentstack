@@ -2,7 +2,7 @@
 id: STORY-010-02
 epic: EPIC-010
 title: Compare screen and asset versions
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M4
@@ -30,3 +30,7 @@ As a reviewer, I want to view before/after revisions, so that I can evaluate a c
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

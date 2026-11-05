@@ -1,0 +1,7 @@
+# Configure TRUST_PROXY to the actual Docker gateway/peer IP, see installation.md.
+# Run Caddy on the host; the app listens on loopback port 4311.
+review.example.com {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:4311
+    header Strict-Transport-Security "max-age=31536000"
+}

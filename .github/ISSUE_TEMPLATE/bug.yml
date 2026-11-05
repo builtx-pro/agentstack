@@ -1,0 +1,22 @@
+name: Bug report
+description: Report a reproducible problem using synthetic data.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use synthetic examples. Never include credentials or customer data.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: AgentStack version or commit
+    validations:
+      required: true

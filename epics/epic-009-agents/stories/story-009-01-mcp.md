@@ -2,7 +2,7 @@
 id: STORY-009-01
 epic: EPIC-009
 title: Connect a stdio MCP client
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M3
@@ -31,3 +31,7 @@ As a developer, I want to connect my agent with project-scoped credentials, so t
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

@@ -2,7 +2,7 @@
 id: STORY-004-01
 epic: EPIC-004
 title: Import and find screens
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M2
@@ -31,3 +31,7 @@ As a developer, I want to import a manifest and search flows/tags, so that I rev
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

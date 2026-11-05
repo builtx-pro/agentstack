@@ -1,7 +1,7 @@
 ---
 id: EPIC-009
 title: MCP, CLI and portable agent kit
-status: backlog
+status: review
 blocked: false
 milestone: M3
 owner: maintainers

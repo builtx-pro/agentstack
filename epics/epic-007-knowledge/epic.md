@@ -1,7 +1,7 @@
 ---
 id: EPIC-007
 title: Editable documents and rules
-status: backlog
+status: review
 blocked: false
 milestone: M3
 owner: maintainers

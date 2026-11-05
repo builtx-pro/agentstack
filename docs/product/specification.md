@@ -80,7 +80,7 @@ Git-интеграция: локальный CLI импортирует/эксп
 ## 12. Установка и эксплуатация
 Один монорепозиторий, Docker Compose: приложение + PostgreSQL + опциональный TLS proxy. CLI bootstrap, миграции, health/readiness, резервирование БД и файлов, проверенное восстановление, обновление/откат. Без Redis/Kubernetes как обязательных зависимостей. Локальный запуск и VPS имеют одинаковую модель данных.
 
-Публичный репозиторий: README EN/RU, LICENSE (решение владельца), CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, issue/PR templates, CI, synthetic demo, starter manifest, инструкции агентов, шаблоны docs/planning. Никаких production DB, клиентских материалов и личных путей.
+Публичный репозиторий: README EN/RU, LICENSE (Apache-2.0 для движка; материалы проектов отдельно), CONTRIBUTING, SECURITY, CODE_OF_CONDUCT, issue/PR templates, CI, synthetic demo, starter manifest, инструкции агентов, шаблоны docs/planning. Никаких production DB, клиентских материалов и личных путей.
 
 ## 13. Безопасность
 Пароли через стойкий KDF; сессии HttpOnly/SameSite, Secure на HTTPS, защита от CSRF и ограничение попыток входа. Membership на сервере и PostgreSQL RLS как второй слой. Агентский token не даёт больше прав, чем его владелец.

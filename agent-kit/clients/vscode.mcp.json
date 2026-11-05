@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "agentstack": {
+      "command": "node",
+      "args": ["/absolute/path/to/agentstack/packages/mcp/dist/main.js"],
+      "type": "stdio",
+      "env": {
+        "AGENTSTACK_URL": "${env:AGENTSTACK_URL}",
+        "AGENTSTACK_TOKEN": "${env:AGENTSTACK_TOKEN}"
+      }
+    }
+  }
+}

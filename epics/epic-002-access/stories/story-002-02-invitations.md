@@ -2,7 +2,7 @@
 id: STORY-002-02
 epic: EPIC-002
 title: Invite a collaborator
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M1
@@ -31,3 +31,7 @@ As a admin, I want to issue and revoke invitations, so that onboarding does not 
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.
