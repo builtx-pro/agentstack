@@ -18,6 +18,7 @@ const messages: Record<string, string> = {
   pagination_limit:
     "The collection page limit was reached. Narrow the query or explicitly raise the limit.",
   network_error: "The server could not be reached securely.",
+  repository_snapshot_too_large: "The repository snapshot is too large. Narrow its configured roots before retrying.",
   timeout: "The request timed out.",
 };
 export class AgentStackError extends Error {

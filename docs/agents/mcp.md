@@ -32,3 +32,7 @@ Prompts `review_feedback`, `plan_sprint`, `update_document` accept a project UUI
 Cancellation propagates to HTTP. Safe errors contain code/status and an actionable generic message; upstream response bodies and credentials are not echoed. The transport uses stdout only for JSON-RPC; startup errors go to stderr.
 
 Implementation reference: [official SDK v1 server guide](https://ts.sdk.modelcontextprotocol.io/server). Protocol compatibility does not imply every host supports every resource/prompt UX; CLI/context export remains available.
+
+## Repository tools
+
+`list_repositories`, `list_repository_snapshots`, `get_repository_snapshot` and `get_repository_pipelines` are scoped read tools. `refresh_repository` takes the current `expectedVersion` and stages provider data with write scope. It never applies it. There are no filesystem, checkout or snapshot-apply tools. Set `AGENTSTACK_TIMEOUT_MS=120000` for provider requests and configure the host tool timeout accordingly. See [repository sync and human review](repository-sync.md).

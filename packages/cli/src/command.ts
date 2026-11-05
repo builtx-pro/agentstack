@@ -22,6 +22,7 @@ import {
 } from "./manifest.service.js";
 import { readGitContext } from "./git-context.service.js";
 import { loginFromStdin } from "./human-session.service.js";
+import { registerRepositoryCommands } from "./repository-commands.service.js";
 
 interface GlobalOptions {
   json?: boolean;
@@ -56,7 +57,7 @@ export function createCommand(): Command {
     .description(
       "AgentStack project-scoped API client. Credentials are read from environment only.",
     )
-    .version("0.1.0")
+    .version("0.2.0")
     .option(
       "--url <origin>",
       "Installation origin (HTTPS; loopback HTTP is allowed)",
@@ -422,5 +423,6 @@ export function createCommand(): Command {
         }
       }
     });
+  registerRepositoryCommands(program, {connection,project,global});
   return program;
 }

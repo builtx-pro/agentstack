@@ -1,0 +1,27 @@
+.card {
+  min-width: 0;
+}
+.path {
+  overflow-wrap: anywhere;
+}
+.compare {
+  min-width: 0;
+  max-height: 360px;
+  overflow: auto;
+  padding: 16px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  border-radius: var(--mantine-radius-md);
+}
+.compare pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.entry {
+  padding-block: 14px;
+  border-bottom: 1px solid var(--app-border);
+}
+.entry:last-child {
+  border-bottom: 0;
+}

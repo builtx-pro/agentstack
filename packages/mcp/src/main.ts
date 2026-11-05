@@ -12,7 +12,13 @@ if (!baseUrl || !token) {
   process.exitCode = 1;
 } else {
   try {
-    const server = createMcpServer(new AgentStackClient({ baseUrl, token }));
+    const timeoutMs = Number(process.env.AGENTSTACK_TIMEOUT_MS ?? 30000);
+    if (!Number.isInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 300000) {
+      throw new Error("Invalid HTTP timeout");
+    }
+    const server = createMcpServer(
+      new AgentStackClient({ baseUrl, token, timeoutMs }),
+    );
     await server.connect(new StdioServerTransport());
     for (const signal of ["SIGINT", "SIGTERM"] as const)
       process.once(signal, () => {

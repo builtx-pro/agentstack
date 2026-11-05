@@ -1,1 +1,14 @@
-{"name": "@agentstack/ui", "version": "0.1.0", "private": true, "type": "module", "exports": {".": "./src/index.ts"}, "peerDependencies": {"@mantine/core": "9.7.5", "@mantine/hooks": "9.7.5", "react": "^19.2.0"}}
+{
+  "name": "@agentstack/ui",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@mantine/core": "9.7.5",
+    "@mantine/hooks": "9.7.5",
+    "react": "^19.2.0"
+  }
+}
