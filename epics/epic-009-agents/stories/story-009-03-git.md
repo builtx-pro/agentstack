@@ -2,7 +2,7 @@
 id: STORY-009-03
 epic: EPIC-009
 title: Exchange manifests with Git
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M3
@@ -31,3 +31,7 @@ As a developer, I want to import/export versioned project material, so that web 
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

@@ -2,7 +2,7 @@
 id: STORY-010-01
 epic: EPIC-010
 title: Inspect delivery health
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M4
@@ -30,3 +30,7 @@ As a reviewer, I want to see progress and activity charts, so that I know what n
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

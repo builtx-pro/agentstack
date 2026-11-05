@@ -4,17 +4,17 @@
 
 | ID | Эпик | Статус | Milestone | Истории (done/всего) |
 |----|------|--------|-----------|----------------------|
-| EPIC-001 | Install and operate AgentStack | ⚫ backlog | M1 | 0/2 |
-| EPIC-002 | Projects and scoped access | ⚫ backlog | M1 | 0/3 |
-| EPIC-003 | Versions, archive and audit | ⚫ backlog | M1 | 0/2 |
-| EPIC-004 | Review screens by user flow | ⚫ backlog | M2 | 0/2 |
-| EPIC-005 | Asset library and usage | ⚫ backlog | M2 | 0/2 |
-| EPIC-006 | Feedback to verified result | ⚫ backlog | M2 | 0/3 |
-| EPIC-007 | Editable documents and rules | ⚫ backlog | M3 | 0/2 |
-| EPIC-008 | Waves, epics, sprints and features | ⚫ backlog | M3 | 0/3 |
-| EPIC-009 | MCP, CLI and portable agent kit | ⚫ backlog | M3 | 0/3 |
-| EPIC-010 | Dashboards and changes | ⚫ backlog | M4 | 0/2 |
-| EPIC-011 | Migrate the existing concepts workspace | ⚫ backlog | M4 | 0/2 |
-| EPIC-012 | Public project and contribution workflow | ⚫ backlog | M4 | 0/2 |
+| EPIC-001 | Install and operate AgentStack | 🔵 review | M1 | 0/2 |
+| EPIC-002 | Projects and scoped access | 🔵 review | M1 | 0/3 |
+| EPIC-003 | Versions, archive and audit | 🔵 review | M1 | 0/2 |
+| EPIC-004 | Review screens by user flow | 🔵 review | M2 | 0/2 |
+| EPIC-005 | Asset library and usage | 🔵 review | M2 | 0/2 |
+| EPIC-006 | Feedback to verified result | 🔵 review | M2 | 0/3 |
+| EPIC-007 | Editable documents and rules | 🔵 review | M3 | 0/2 |
+| EPIC-008 | Waves, epics, sprints and features | 🔵 review | M3 | 0/3 |
+| EPIC-009 | MCP, CLI and portable agent kit | 🔵 review | M3 | 0/3 |
+| EPIC-010 | Dashboards and changes | 🔵 review | M4 | 0/2 |
+| EPIC-011 | Migrate the existing concepts workspace | 🟡 in-progress | M4 | 0/2 |
+| EPIC-012 | Public project and contribution workflow | 🔵 review | M4 | 0/2 |
 
 _Эпиков: 12. Статусы: backlog → ready → in-progress → review → done; blocked — флаг._

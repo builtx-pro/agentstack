@@ -1,0 +1,6 @@
+import {Stack,Text,Paper,Group,Badge} from '@mantine/core';
+import type {ReviewNote} from '@shared/api/schemas';
+import {formatDate} from '@shared/lib/format.util';
+import {StatusBadge} from '@shared/ui/status-badge.component';
+import classes from './history.module.css';
+export function RevisionNotes({notes,version}:{notes:ReviewNote[];version:number}){return <Stack gap="sm" mt="lg" component="section" aria-label={`Comments on version ${version}`}><Group justify="space-between"><Text fw={600} size="sm">Comments on v{version}</Text><Badge color="gray" size="xs">Read only · {notes.length}</Badge></Group><Text size="xs" c="dimmed">Only comments attached to this revision. Review status reflects its current state.</Text>{notes.length===0?<Text size="sm" c="dimmed">No comments on this revision.</Text>:notes.map(note=><Paper key={note.id} withBorder p="sm"><Stack gap="xs"><Group justify="space-between"><Text size="xs" fw={600}>{note.authorName}</Text><StatusBadge status={note.status}/></Group><Text className={classes.value} size="sm">{note.body}</Text><Text size="xs" c="dimmed">{formatDate(note.createdAt)}{note.visibility==='team'?' · Team only':''}</Text>{note.result&&<Text size="xs" className={classes.value}>Reported result: {note.result.summary}</Text>}</Stack></Paper>)}</Stack>;}

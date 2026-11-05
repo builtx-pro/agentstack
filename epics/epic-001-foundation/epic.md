@@ -1,7 +1,7 @@
 ---
 id: EPIC-001
 title: Install and operate AgentStack
-status: backlog
+status: review
 blocked: false
 milestone: M1
 owner: maintainers

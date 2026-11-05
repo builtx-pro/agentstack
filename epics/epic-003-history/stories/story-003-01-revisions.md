@@ -2,7 +2,7 @@
 id: STORY-003-01
 epic: EPIC-003
 title: Compare object revisions
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M1
@@ -35,3 +35,7 @@ As a developer, I want to see who changed content and compare versions, so that 
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

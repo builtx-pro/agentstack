@@ -1,7 +1,7 @@
 ---
 id: EPIC-010
 title: Dashboards and changes
-status: backlog
+status: review
 blocked: false
 milestone: M4
 owner: maintainers

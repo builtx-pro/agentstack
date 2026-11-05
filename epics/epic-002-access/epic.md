@@ -1,7 +1,7 @@
 ---
 id: EPIC-002
 title: Projects and scoped access
-status: backlog
+status: review
 blocked: false
 milestone: M1
 owner: maintainers

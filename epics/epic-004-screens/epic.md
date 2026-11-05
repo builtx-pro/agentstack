@@ -1,7 +1,7 @@
 ---
 id: EPIC-004
 title: Review screens by user flow
-status: backlog
+status: review
 blocked: false
 milestone: M2
 owner: maintainers

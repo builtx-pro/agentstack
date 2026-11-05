@@ -1,0 +1,3 @@
+import { createRootRoute,Outlet } from '@tanstack/react-router';
+import { Alert,Container,Button,Stack } from '@mantine/core';
+export const Route=createRootRoute({component:Outlet,errorComponent:({error,reset})=><Container py="xl"><Alert color="red" title="This page couldn't open"><Stack>{error instanceof Error?error.message:'Unexpected error'}<Button onClick={reset}>Try again</Button></Stack></Alert></Container>,notFoundComponent:()=> <Container py="xl"><Alert title="Page not found">Open the project workspace from the home page.</Alert><Button component="a" href="/" mt="md">Projects</Button></Container>});

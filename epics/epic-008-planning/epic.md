@@ -1,7 +1,7 @@
 ---
 id: EPIC-008
 title: Waves, epics, sprints and features
-status: backlog
+status: review
 blocked: false
 milestone: M3
 owner: maintainers

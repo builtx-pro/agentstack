@@ -2,7 +2,7 @@
 id: STORY-012-02
 epic: EPIC-012
 title: Pass release verification
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M4
@@ -31,3 +31,7 @@ As a maintainer, I want to run CI and role/browser/security checks, so that publ
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

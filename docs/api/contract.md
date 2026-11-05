@@ -85,3 +85,15 @@ Single custom Mantine theme, light/dark, neutral slate background + violet accen
 - An archived wave/epic removes descendant stories from effective active progress scope. Archived sprints do not remove stories from project totals. Features are many-to-many; no duplicate IDs.
 - Privacy applies transitively to relationships; clients never receive hidden referenced IDs. Archive history is preserved. No hard-delete business objects.
 - Migration preserves private principal/request/event IDs in private provenance, never public DTOs. Imported display names are explicitly marked unverified.
+
+## Integrated contract revisions
+- User DTOs include `version` and `disabled`. User PATCH requires `expectedVersion`. Human admins can read `/admin/activity` and `/users/:id/history`; password changes record only `passwordChanged`, never credentials.
+- Membership creation uses `expectedVersion:0`; update/revoke/regrant uses the latest version. DELETE accepts `{expectedVersion}` and soft-revokes. Admin `GET .../members?includeRevoked=true` returns `revokedAt` and versions.
+- Flow data includes optional `stateIds` for alternative states separate from ordered `screenIds`.
+- Context responses have a 1 MiB budget and explicit `nextCursors`, `continuations`, `omittedObjects` and `contextBudget`. Fetch remaining rules before executing work.
+- Uploaded files are deduplicated by verified content within a project; unchanged file manifests are idempotent across dry-run and apply.
+- `TRUST_PROXY` defaults to no forwarded-header trust. Only explicitly configured proxy addresses/CIDRs are trusted. Authenticated API limits use principals; login has its own IP limit.
+
+- Claims record `claimedRuleRevisions?: [{id,version}] | null`. The server supplies the snapshot and checks it at submit under the same project rule lock as rule edits. `rules_changed` and `rules_snapshot_required` are recoverable conflicts requiring a deliberate new claim. Customer DTOs omit internal rule IDs.
+- Context also contains bounded `activeClaims` with continuation metadata.
+- `GET /projects/:projectId/legacy?kind=screen|asset&key=...&note=...` resolves authorized Concepts bookmarks to `{targetId,section,noteId?}` without returning private provenance.

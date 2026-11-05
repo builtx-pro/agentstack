@@ -2,7 +2,7 @@
 id: STORY-003-02
 epic: EPIC-003
 title: Archive and restore content
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M1
@@ -31,3 +31,7 @@ As a developer, I want to archive and restore old content as a new version, so t
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

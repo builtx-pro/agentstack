@@ -1,0 +1,6 @@
+import { Text,Group,Badge,Button } from '@mantine/core';
+import { IconMessageCircle,IconArrowUpRight } from '@tabler/icons-react';
+import type { ProjectObject } from '@shared/api/schemas';
+import { ObjectPreview } from './object-preview.component';
+import classes from './viewer.module.css';
+export function ObjectCard({object,noteCount,onOpen}:{object:ProjectObject;noteCount:number;onOpen:()=>void}){return <article className={classes.card}><button type="button" className={classes.cardPreview} onClick={onOpen} aria-label={`Review ${object.title}`}><ObjectPreview object={object} compact/></button><div className={classes.cardMeta}><Text fw={650} lineClamp={1}>{object.title}</Text><Text size="xs" c="dimmed" lineClamp={1}>{object.key} · v{object.version}</Text><div className={classes.cardTags}>{object.tags.slice(0,3).map(tag=><Badge key={tag} size="xs" color="gray">{tag}</Badge>)}</div></div><div className={classes.cardFooter}><Group gap={5}><IconMessageCircle size={15} color="var(--mantine-color-dimmed)"/><Text size="xs" c="dimmed">{noteCount?`${noteCount} ${noteCount===1?'note':'notes'}`:'No notes'}</Text></Group><Button variant="subtle" size="compact-xs" rightSection={<IconArrowUpRight size={14}/>} onClick={onOpen}>Review</Button></div></article>;}

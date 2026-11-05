@@ -1,0 +1,72 @@
+name: agentstack
+x-app: &app
+  build: .
+  image: agentstack:local
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+  restart: unless-stopped
+  volumes:
+    - files:/data/files
+  networks: [internal]
+services:
+  database:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: agentstack
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run tools/setup/init-env.mjs first}
+    volumes:
+      - database:/var/lib/postgresql
+    networks: [internal]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres -d agentstack]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    <<: *app
+    restart: 'no'
+    command: [npm, run, migrate]
+    environment:
+      DATABASE_OWNER_URL: postgresql://postgres:${POSTGRES_PASSWORD}@database:5432/agentstack
+      APP_DATABASE_PASSWORD: ${APP_DATABASE_PASSWORD:?Run setup first}
+    depends_on:
+      database:
+        condition: service_healthy
+  app:
+    <<: *app
+    ports:
+      - '${HOST_BIND:-127.0.0.1}:${HOST_PORT:-4311}:4100'
+    environment:
+      DATABASE_URL: postgresql://agentstack_app:${APP_DATABASE_PASSWORD}@database:5432/agentstack
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:4311}
+      TRUST_PROXY: ${TRUST_PROXY:-}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4100/api/v1/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  bootstrap:
+    <<: *app
+    profiles: [tools]
+    restart: 'no'
+    command: [npm, run, bootstrap]
+    stdin_open: true
+    environment:
+      DATABASE_OWNER_URL: postgresql://postgres:${POSTGRES_PASSWORD}@database:5432/agentstack
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
+      ADMIN_NAME: ${ADMIN_NAME:-Workspace owner}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+networks:
+  internal:
+volumes:
+  database:
+  files:

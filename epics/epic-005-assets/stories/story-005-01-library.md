@@ -2,7 +2,7 @@
 id: STORY-005-01
 epic: EPIC-005
 title: Find and discuss assets
-status: backlog
+status: review
 blocked: false
 priority: must
 milestone: M2
@@ -30,3 +30,7 @@ As a reviewer, I want to search illustrations and leave feedback, so that visual
 ## References
 - [Specification](../../../docs/product/specification.md)
 - [Architecture](../../../docs/architecture/overview.md)
+
+## Implementation evidence
+
+The vertical workflow is implemented. See [release verification](../../../docs/releases/0.1.0-verification.md) for observed checks and operational boundaries. Final live cutover remains tracked separately in STORY-011-02.

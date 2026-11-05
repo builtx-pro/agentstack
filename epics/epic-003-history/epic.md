@@ -1,7 +1,7 @@
 ---
 id: EPIC-003
 title: Versions, archive and audit
-status: backlog
+status: review
 blocked: false
 milestone: M1
 owner: maintainers

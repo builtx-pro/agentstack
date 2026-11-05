@@ -1,7 +1,7 @@
 ---
 id: EPIC-005
 title: Asset library and usage
-status: backlog
+status: review
 blocked: false
 milestone: M2
 owner: maintainers

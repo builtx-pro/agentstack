@@ -1,0 +1,45 @@
+{
+  "name": "@agentstack/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4310",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@agentstack/ui": "file:../../packages/ui",
+    "@mantine/core": "9.7.5",
+    "@mantine/form": "9.7.5",
+    "@mantine/hooks": "9.7.5",
+    "@mantine/notifications": "9.7.5",
+    "@tabler/icons-react": "latest",
+    "@tanstack/react-query": "^5.106.1",
+    "@tanstack/react-router": "^1.170.46",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "latest",
+    "remark-gfm": "latest",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@tanstack/router-plugin": "latest",
+    "@testing-library/react": "latest",
+    "@testing-library/user-event": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "jsdom": "latest",
+    "postcss": "latest",
+    "postcss-preset-mantine": "latest",
+    "postcss-simple-vars": "latest",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}

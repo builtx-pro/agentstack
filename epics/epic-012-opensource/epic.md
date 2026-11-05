@@ -1,7 +1,7 @@
 ---
 id: EPIC-012
 title: Public project and contribution workflow
-status: backlog
+status: review
 blocked: false
 milestone: M4
 owner: maintainers
