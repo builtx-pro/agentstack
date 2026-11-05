@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createHumanSession } from "./human-session.service.js";
+afterEach(() => vi.restoreAllMocks());
 const projectId = "11111111-1111-4111-8111-111111111111";
 describe("explicit human CLI session", () => {
   it("keeps the cookie in memory and logs out through the same origin", async () => {
@@ -48,4 +49,20 @@ describe("explicit human CLI session", () => {
       }),
     ).rejects.toThrow("Authentication failed");
   });
+  it("keeps login bounded while forwarding an extended request timeout to the human client", async () => {
+    const timeout = vi.spyOn(AbortSignal, "timeout");
+    const fetch = vi.fn(async (url: unknown) => String(url).endsWith("/auth/login")
+      ? Response.json({}, {headers: {"Set-Cookie": "agentstack_session=synthetic-session; HttpOnly"}})
+      : Response.json(String(url).endsWith("/auth/logout") ? {ok: true} : {items: [], nextCursor: null}));
+    const session = await createHumanSession({baseUrl: "http://127.0.0.1:4300", email: "operator@example.test", password: "synthetic-input-only", timeoutMs: 120000, fetch});
+    await session.client.projects();
+    await session.logout();
+    expect(timeout.mock.calls.map(call => call[0])).toEqual([30000, 120000, 120000]);
+  });
+  it.each([0, -1, 1.5, 600001, Infinity, NaN])("rejects invalid human request timeout %s before authenticating", async timeoutMs => {
+    const fetch = vi.fn();
+    await expect(createHumanSession({baseUrl: "http://127.0.0.1:4300", email: "operator@example.test", password: "synthetic-input-only", timeoutMs, fetch})).rejects.toThrow();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
 });

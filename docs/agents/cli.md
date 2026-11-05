@@ -38,3 +38,16 @@ The sample describes the format, not tests that were run for your project. Repla
 Create/update use JSON files matching the API contract. `objects create` and `notes create` accept `--request-id UUID` for safe retry. `objects update` requires `expectedVersion` in the input. Rules and completed statuses remain server-restricted for agent tokens. There is intentionally no CLI command to accept a result using an agent token.
 
 `--json` emits machine JSON on stdout. Errors and upload-reconciliation warnings go to stderr; failure exits nonzero. Output files are created exclusively with owner-only permissions; an existing path is never silently overwritten.
+
+## Request timeouts
+
+`--timeout-ms <milliseconds>` is a global option for both agent-token commands and explicit human imports. It defaults to 30000 and accepts integers from 1 to 600000. For a large catalog, for example:
+
+```sh
+node packages/cli/dist/main.js --timeout-ms 300000 --project PROJECT_UUID import /private/export/manifest.json \
+  --human --email owner@example.com --password-stdin --apply < /private/operator-password
+```
+
+The value applies to each request, not the entire command. Human login remains capped at 30000 ms. The SDK's `createHumanSession` accepts the same optional `timeoutMs` and passes it to its authenticated client.
+
+A timeout can happen after the server commits an import. The CLI never automatically retries an uncertain mutation or rolls it back. Read the current catalog and reconcile the result before retrying; retain the reported uploaded file IDs for investigation.

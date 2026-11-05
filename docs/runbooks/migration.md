@@ -55,3 +55,11 @@ npx tsx apps/server/src/cli/import-legacy.ts \
 ```
 
 Use `--apply` instead of `--dry-run` after reconciliation. Repeating the exact input skips existing notes. A changed legacy note conflicts and requires deliberate reconciliation; it never overwrites newer AgentStack work.
+
+## Keep presentations and interactive tools reachable
+
+Preserve the complete immutable legacy static release, including shared fonts, archived screenshots referenced by decks, lazy model packs and URL-fragment state. Do not replace its directory with a screen-only export. Keep the original URLs and protect them with their existing access mechanism; link access does not bypass authentication.
+
+Create Knowledge documents for the retained presentations, editors and other tools. Add Markdown links to their entrypoints and tag each document `project-resource` to show a card on the project overview. These documents support the normal comments, project visibility, revisions and archive behavior. Archived documents disappear from the overview.
+
+Before switching routes, compare a full path/size/SHA-256 inventory. After switching, verify presentation navigation and PDFs, actual 3D rendering, lazy item loading, shared-link reload and image export in a browser. Keep the legacy landing available at a path that preserves its relative-link resolution.

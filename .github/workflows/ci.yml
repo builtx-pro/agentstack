@@ -29,4 +29,19 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e --workspace @agentstack/web
       - run: npm audit --omit=dev --audit-level=high
+      - name: Exercise a private source checkout
+        run: |
+          python3 - <<'PYTHON'
+          import os, pathlib, subprocess
+          for raw in subprocess.check_output(['git', 'ls-files', '-z']).split(b'\0'):
+              if not raw:
+                  continue
+              path = pathlib.Path(os.fsdecode(raw))
+              path.chmod(0o700 if path.stat().st_mode & 0o111 else 0o600)
+              for parent in path.parents:
+                  if parent != pathlib.Path('.'):
+                      parent.chmod(0o700)
+          PYTHON
       - run: docker build -t agentstack:ci .
+      - name: Verify non-root runtime can read its application and license
+        run: docker run --rm agentstack:ci node --input-type=module -e "import {readFileSync} from 'node:fs'; import assert from 'node:assert/strict'; assert.notEqual(process.getuid(),0); for (const path of ['/app/package.json','/app/apps/server/src/main.ts','/app/LICENSE','/app/NOTICE']) assert.ok(readFileSync(path).length);"

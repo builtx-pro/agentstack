@@ -27,6 +27,7 @@ interface GlobalOptions {
   json?: boolean;
   project?: string;
   url?: string;
+  timeoutMs?: number;
 }
 function connection(command: Command): AgentStackClient {
   const options = command.optsWithGlobals<GlobalOptions>();
@@ -36,7 +37,7 @@ function connection(command: Command): AgentStackClient {
     throw new Error(
       "Set AGENTSTACK_URL and AGENTSTACK_TOKEN in the process environment.",
     );
-  return new AgentStackClient({ baseUrl, token });
+  return new AgentStackClient({ baseUrl, token, timeoutMs: options.timeoutMs });
 }
 function project(command: Command): string {
   return idSchema.parse(
@@ -59,6 +60,12 @@ export function createCommand(): Command {
     .option(
       "--url <origin>",
       "Installation origin (HTTPS; loopback HTTP is allowed)",
+    )
+    .option(
+      "--timeout-ms <milliseconds>",
+      "Per-request timeout (1–600000 ms; uncertain writes are never retried)",
+      value => z.coerce.number().int().positive().max(600000).parse(value),
+      30000,
     )
     .option("--project <uuid>", "Project identifier (or AGENTSTACK_PROJECT)")
     .option("--json", "Machine-readable JSON; errors remain on stderr");
@@ -343,6 +350,7 @@ export function createCommand(): Command {
             global(command).url ?? process.env.AGENTSTACK_URL,
             options.email,
             options.passwordStdin,
+            global(command).timeoutMs,
           )
         : undefined;
       const api = session?.client ?? connection(command);
@@ -397,7 +405,7 @@ export function createCommand(): Command {
           process.stderr.write(
             JSON.stringify({
               warning:
-                "Import did not complete. Uploaded files may be unreferenced; retain this list for operator cleanup. No object rollback was attempted.",
+                "Import failed or its result was not confirmed. Reconcile the catalog before retrying: a timeout does not prove rollback. Uploaded files may be unreferenced; retain this list for operator cleanup. No object rollback was attempted.",
               uploadedFileIds: [...uploaded.values()],
             }) + "\n",
           );
