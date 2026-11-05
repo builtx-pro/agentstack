@@ -8,11 +8,13 @@ export async function createHumanSession(options: {
   baseUrl: string;
   email: string;
   password: string;
+  timeoutMs?: number;
   fetch?: typeof globalThis.fetch;
 }): Promise<{ client: AgentStackClient; logout: () => Promise<void> }> {
   const baseUrl = normalizeBaseUrl(options.baseUrl);
   const email = z.string().email().max(320).parse(options.email);
   z.string().min(1).max(1024).parse(options.password);
+  const timeoutMs = z.number().int().positive().max(600000).parse(options.timeoutMs ?? 30000);
   const fetcher = options.fetch ?? globalThis.fetch;
   let response: Response;
   try {
@@ -25,7 +27,7 @@ export async function createHumanSession(options: {
       },
       body: JSON.stringify({ email, password: options.password }),
       redirect: "error",
-      signal: AbortSignal.timeout(30000),
+      signal: AbortSignal.timeout(Math.min(30000, timeoutMs)),
     });
   } catch {
     throw new AgentStackError("network_error");
@@ -44,6 +46,7 @@ export async function createHumanSession(options: {
     baseUrl,
     sessionCookie: cookie,
     fetch: fetcher,
+    timeoutMs,
   });
   let ended = false;
   return {

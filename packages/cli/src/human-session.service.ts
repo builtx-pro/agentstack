@@ -4,6 +4,7 @@ export async function loginFromStdin(
   baseUrl: string | undefined,
   email: string | undefined,
   passwordStdin: boolean | undefined,
+  timeoutMs?: number,
 ) {
   if (!baseUrl || !email || !passwordStdin)
     throw new Error(
@@ -28,5 +29,5 @@ export async function loginFromStdin(
   for (const chunk of chunks) chunk.fill(0);
   if (!password || /[\r\n]/.test(password))
     throw new Error("Password input must contain exactly one nonempty line.");
-  return createHumanSession({ baseUrl, email, password });
+  return createHumanSession({ baseUrl, email, password, timeoutMs });
 }

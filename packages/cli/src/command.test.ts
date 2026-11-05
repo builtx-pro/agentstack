@@ -11,6 +11,10 @@ let server: Server;
 let origin: string;
 let directory: string;
 let logouts = 0;
+let requestDelay = 0;
+let imports = 0;
+let successfulPreflight = false;
+let requests = 0;
 function run(
   args: string[],
   input?: string,
@@ -41,7 +45,12 @@ function run(
 beforeEach(async () => {
   directory = await mkdtemp(join(tmpdir(), "agentstack-command-"));
   logouts = 0;
+  requestDelay = 0;
+  imports = 0;
+  successfulPreflight = false;
+  requests = 0;
   server = createServer(async (request, response) => {
+    requests++;
     response.setHeader("Content-Type", "application/json");
     let body = "";
     for await (const part of request) body += part;
@@ -64,6 +73,12 @@ beforeEach(async () => {
       return;
     }
     if (request.url?.endsWith("/import")) {
+      imports++;
+      if (successfulPreflight && JSON.parse(body).dryRun === true) {
+        response.end(JSON.stringify({dryRun: true, created: 0, updated: 0, unchanged: 0, items: []}));
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, requestDelay));
       expect(request.headers.authorization).toBeUndefined();
       expect(request.headers.cookie).toBe(
         "agentstack_session=synthetic-cookie",
@@ -74,6 +89,7 @@ beforeEach(async () => {
       );
       return;
     }
+    await new Promise(resolve => setTimeout(resolve, requestDelay));
     expect(request.headers.authorization).toBe("Bearer test-token");
     if (request.url?.includes("/capabilities"))
       response.end(
@@ -131,4 +147,34 @@ describe("CLI process", () => {
       /synthetic-password|synthetic-cookie|do not echo secret/,
     );
   });
+  it.each(["0", "-1", "1.5", "600001", "Infinity", "nope"])("rejects invalid CLI timeout %s without API calls", async value => {
+    const result = await run(["--timeout-ms", value, "projects", "--json"]);
+    expect(result.code).not.toBe(0);
+    expect(requests).toBe(0);
+  });
+  it("accepts the maximum request timeout", async () => {
+    const result = await run(["--timeout-ms", "600000", "projects", "--json"]);
+    expect(result.code).toBe(0);
+    expect(JSON.parse(result.stdout).items).toEqual([]);
+  });
+  it("applies the selected timeout to agent-token requests", async () => {
+    requestDelay = 150;
+    const result = await run(["--timeout-ms", "50", "projects", "--json"]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("timeout");
+    expect(requests).toBe(1);
+  });
+  it("applies the selected timeout to human imports without retrying an uncertain write", async () => {
+    requestDelay = 150;
+    successfulPreflight = true;
+    const path = join(directory, "manifest.json");
+    await writeFile(path, JSON.stringify({schemaVersion: 1, objects: [], files: []}));
+    const result = await run(["--timeout-ms", "50", "import", path, "--human", "--email", "operator@example.test", "--password-stdin", "--apply", "--json"], "synthetic-password\n");
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain("timeout");
+    expect(imports).toBe(2);
+    expect(result.stderr).toContain("timeout does not prove rollback");
+    expect(logouts).toBe(1);
+  });
+
 });
