@@ -14,7 +14,7 @@
 | EPIC-008 | Waves, epics, sprints and features | 🔵 review | M3 | 0/3 |
 | EPIC-009 | MCP, CLI and portable agent kit | 🔵 review | M3 | 0/3 |
 | EPIC-010 | Dashboards and changes | 🔵 review | M4 | 0/2 |
-| EPIC-011 | Migrate the existing concepts workspace | 🟡 in-progress | M4 | 0/2 |
+| EPIC-011 | Migrate the existing concepts workspace | 🔵 review | M4 | 0/2 |
 | EPIC-012 | Public project and contribution workflow | 🔵 review | M4 | 0/2 |
 
 _Эпиков: 12. Статусы: backlog → ready → in-progress → review → done; blocked — флаг._
