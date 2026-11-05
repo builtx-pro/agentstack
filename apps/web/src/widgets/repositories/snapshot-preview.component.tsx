@@ -202,6 +202,12 @@ export function SnapshotPreview({
                   <div className={classes.entry} key={entry.key}>
                     <Group justify="space-between" align="start" wrap="nowrap">
                       <Checkbox
+                        className={classes.entryChoice}
+                        classNames={{
+                          labelWrapper: classes.entryLabelWrapper,
+                          label: classes.entryText,
+                          description: classes.entryText,
+                        }}
                         checked={selected.includes(entry.key)}
                         disabled={!eligible}
                         onChange={(event) =>
@@ -211,6 +217,7 @@ export function SnapshotPreview({
                         description={entry.path}
                       />
                       <Badge
+                        className={classes.entryStatus}
                         color={
                           conflict
                             ? "orange"
@@ -251,6 +258,9 @@ export function SnapshotPreview({
                       </Text>
                     )}
                     <Button
+                      className={classes.compareButton}
+                      classNames={{ label: classes.compareButtonLabel }}
+                      aria-label={`${expanded === entry.key ? "Hide comparison" : "Compare changes"}: ${entry.title}`}
                       variant="subtle"
                       size="compact-xs"
                       mt="sm"
@@ -261,7 +271,6 @@ export function SnapshotPreview({
                       {expanded === entry.key
                         ? "Hide comparison"
                         : "Compare changes"}
-                      : {entry.title}
                     </Button>
                     {expanded === entry.key && (
                       <SimpleGrid cols={{ base: 1, md: 2 }} mt="md">
