@@ -36,3 +36,5 @@
 - [Epics and stories](../epics/README.md)
 
 Planning documents describe the intended contract. Story records and release verification distinguish implemented behavior from outstanding work.
+
+- [Repository connections, reviewed sync and CI templates](agents/repository-sync.md)

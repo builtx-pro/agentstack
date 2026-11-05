@@ -24,11 +24,13 @@ for (const file of ['.env', '.data/bootstrap-password']) {
 }
 const ownerPassword = randomBytes(32).toString('hex');
 const appPassword = randomBytes(32).toString('hex');
+const repositoryKey = randomBytes(32).toString('base64');
 const adminPassword = randomBytes(24).toString('base64url');
 await mkdir('.data', { recursive: true, mode: 0o700 });
 const lines = [
   `APP_ORIGIN=${origin.origin}`, `HOST_PORT=${values.port}`, 'HOST_BIND=127.0.0.1',
   `POSTGRES_PASSWORD=${ownerPassword}`, `APP_DATABASE_PASSWORD=${appPassword}`,
+  `REPOSITORY_ENCRYPTION_KEY=${repositoryKey}`,
   `ADMIN_EMAIL='${values.email}'`, `ADMIN_NAME="${values.name}"`,
 ];
 await writeFile('.env', lines.join('\n') + '\n', { flag: 'wx', mode: 0o600 });

@@ -8,6 +8,7 @@ const env = z
     WEB_DIST: z.string().optional(),
     PORT: z.coerce.number().int().min(1).max(65535).default(4100),
     TRUST_PROXY: z.string().optional(),
+    REPOSITORY_ENCRYPTION_KEY: z.string().optional(),
     HOST: z.string().default("127.0.0.1"),
   })
   .parse(process.env);
@@ -17,6 +18,7 @@ const app = await buildApp({
   storageDir: env.STORAGE_DIR,
   webDist: env.WEB_DIST,
   trustProxy: env.TRUST_PROXY,
+  repositoryEncryptionKey: env.REPOSITORY_ENCRYPTION_KEY || undefined,
   secureCookies: new URL(env.APP_ORIGIN).protocol === "https:",
 });
 let stopping = false;

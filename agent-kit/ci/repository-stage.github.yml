@@ -1,0 +1,49 @@
+# Alternative for a local connection/private source with no provider token on the server.
+# Copy ONE GitHub template to .github/workflows/agentstack-sync.yml.
+name: AgentStack committed snapshot
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["docs/**", "epics/**", "AGENTS.md", "CLAUDE.md"]
+permissions:
+  contents: read
+concurrency:
+  group: agentstack-repository-sync
+  cancel-in-progress: false
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      AGENTSTACK_ENGINE_REF: ${{ vars.AGENTSTACK_ENGINE_REF }}
+    steps:
+      - name: Require a pinned AgentStack engine commit
+        shell: bash
+        run: '[[ "$AGENTSTACK_ENGINE_REF" =~ ^[a-f0-9]{40}$ ]]'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: source
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: builtx-pro/agentstack
+          ref: ${{ vars.AGENTSTACK_ENGINE_REF }}
+          path: engine
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+      - name: Build the pinned client
+        working-directory: engine
+        run: |
+          npm ci --ignore-scripts
+          npm run build --workspace @agentstack/sdk
+          npm run build --workspace @agentstack/cli
+      - name: Stage only committed Markdown
+        env:
+          AGENTSTACK_URL: ${{ vars.AGENTSTACK_URL }}
+          AGENTSTACK_TOKEN: ${{ secrets.AGENTSTACK_TOKEN }}
+          AGENTSTACK_PROJECT: ${{ vars.AGENTSTACK_PROJECT }}
+          AGENTSTACK_CONNECTION: ${{ vars.AGENTSTACK_CONNECTION }}
+        run: node engine/packages/cli/dist/main.js --project "$AGENTSTACK_PROJECT" --timeout-ms 120000 repositories sync "$AGENTSTACK_CONNECTION" --repo "$GITHUB_WORKSPACE/source" --branch "$GITHUB_REF_NAME" --stage

@@ -12,7 +12,7 @@ import { listNotes } from "../reviews/reviews.service.js";
 import { decodeCursor, page } from "../shared/pagination.util.js";
 import { forbidden } from "../shared/errors.js";
 export const capabilities = {
-  version: "0.1.0",
+  version: "0.2.0",
   apiVersion: 1,
   objectKinds: objectKindSchema.options,
   features: [
@@ -28,6 +28,9 @@ export const capabilities = {
     "manifest-import",
     "progress",
     "context",
+    "repositories",
+    "reviewed-repository-sync",
+    "pipeline-summaries",
   ],
   mcpTransport: "stdio",
 };

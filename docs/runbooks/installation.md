@@ -35,3 +35,9 @@ Create a project, add users/members, then import a synthetic example or your own
 ## Status
 
 This guide is part of the implementation contract. The release report must record successful fresh install, backup/restore and upgrade checks before a production release is declared ready.
+
+## Private repository credentials
+
+New setup files include `REPOSITORY_ENCRYPTION_KEY`, a unique canonical base64 encoding of 32 random bytes. For an existing installation, run `node tools/setup/ensure-repository-key.mjs /private/path/to/.env` on the deployment host. It adds a key only when missing, preserves an existing valid key, refuses symbolic links and never prints the value. Recreate the application container after changing configuration. Public repository connections do not require a stored token.
+
+Keep this key with the protected deployment configuration and database backups. Private provider credentials are encrypted with it. Do not regenerate it during ordinary upgrades: changing or losing it requires re-entering each private repository credential. Do not copy the key or provider tokens into Git, logs, screenshots or client configuration.

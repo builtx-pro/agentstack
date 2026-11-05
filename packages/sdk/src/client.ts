@@ -3,6 +3,7 @@ import { ApiTransport } from "./transport.client.js";
 import { AgentStackError } from "./errors.errors.js";
 import { retryRateLimitedUpload } from "./upload-retry.util.js";
 import * as S from "./schemas.schema.js";
+import * as R from "./repository.schema.js";
 import type {
   ClientOptions,
   RequestOptions,
@@ -74,6 +75,92 @@ export class AgentStackClient {
       `${projectPath(projectId)}/objects${query(filters)}`,
       S.pageSchema(S.objectSchema),
       undefined,
+      options,
+    );
+  }
+  repositories(projectId: string, options?: RequestOptions) {
+    return this.transport.request(
+      "GET",
+      `${projectPath(projectId)}/repositories`,
+      S.pageSchema(R.repositorySchema),
+      undefined,
+      options,
+    );
+  }
+  repository(
+    projectId: string,
+    connectionId: string,
+    options?: RequestOptions,
+  ) {
+    return this.transport.request(
+      "GET",
+      `${projectPath(projectId)}/repositories/${S.idSchema.parse(connectionId)}`,
+      R.repositorySchema,
+      undefined,
+      options,
+    );
+  }
+  repositoryPipelines(projectId: string, options?: RequestOptions) {
+    return this.transport.request(
+      "GET",
+      `${projectPath(projectId)}/repositories/pipelines`,
+      S.pageSchema(R.repositoryPipelineGroupSchema),
+      undefined,
+      options,
+    );
+  }
+  repositorySnapshots(
+    projectId: string,
+    connectionId: string,
+    options?: RequestOptions,
+  ) {
+    return this.transport.request(
+      "GET",
+      `${projectPath(projectId)}/repositories/${S.idSchema.parse(connectionId)}/snapshots`,
+      S.pageSchema(R.repositorySnapshotSummarySchema),
+      undefined,
+      options,
+    );
+  }
+  repositorySnapshot(
+    projectId: string,
+    connectionId: string,
+    snapshotId: string,
+    options?: RequestOptions,
+  ) {
+    return this.transport.request(
+      "GET",
+      `${projectPath(projectId)}/repositories/${S.idSchema.parse(connectionId)}/snapshots/${S.idSchema.parse(snapshotId)}`,
+      R.repositorySnapshotSchema,
+      undefined,
+      options,
+    );
+  }
+  refreshRepository(
+    projectId: string,
+    connectionId: string,
+    expectedVersion: number,
+    options?: RequestOptions,
+  ) {
+    return this.transport.request(
+      "POST",
+      `${projectPath(projectId)}/repositories/${S.idSchema.parse(connectionId)}/refresh`,
+      R.repositorySnapshotSchema,
+      { expectedVersion: S.versionSchema.parse(expectedVersion) },
+      options,
+    );
+  }
+  stageRepositorySnapshot(
+    projectId: string,
+    connectionId: string,
+    snapshot: R.RepositorySnapshotInput,
+    options?: RequestOptions,
+  ) {
+    return this.transport.request(
+      "POST",
+      `${projectPath(projectId)}/repositories/${S.idSchema.parse(connectionId)}/snapshots`,
+      R.repositorySnapshotSchema,
+      R.repositorySnapshotInputSchema.parse(snapshot),
       options,
     );
   }

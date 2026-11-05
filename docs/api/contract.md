@@ -101,3 +101,22 @@ Single custom Mantine theme, light/dark, neutral slate background + violet accen
 ### Catalog page size
 
 `GET /projects/:projectId/objects` accepts `limit` from 1 to 1000 (default 50), with the existing cursor and visibility/project filters. Other collection endpoints keep the 100-row maximum. The web catalog requests 1000 rows per page to reduce sequential round trips; this does not grant additional visibility or skip pagination. SDK clients with large document payloads can select smaller pages to remain within their response-byte budget.
+
+## Repository connections (schema 4)
+
+All routes below are relative to `/projects/:projectId/repositories`. Connections and source snapshots are team-only; configuration requires a human administrator and application requires a human editor. Agent tokens can read and stage with their corresponding scopes.
+
+| Method and path | Contract |
+| --- | --- |
+| GET `/`, GET `/:id` | Whitelisted connection metadata; credentials never returned |
+| POST `/` | `{provider,repository,branch,label,roots?,token?,sharePipelines?}`; GitHub.com, GitLab.com or local |
+| PATCH `/:id` | `{expectedVersion,label?,branch?,roots?,token?:string\|null,archived?,sharePipelines?}` |
+| POST `/:id/refresh` | `{expectedVersion}`; bounded provider fetch stages a snapshot, no object edits |
+| POST `/:id/snapshots` | `{expectedVersion,branch,commit,files:[{path,content}],pipelines?}`; caller-reported provenance |
+| GET `/:id/snapshots` | Latest 30 immutable snapshot summaries |
+| GET `/:id/snapshots/:snapshotId` | Draft entries and current new/changed/unchanged/conflict/missing states |
+| POST `/:id/snapshots/:snapshotId/apply` | `{expectedVersion,entries:[{key,expectedObjectVersion,resolveConflict?}]}`; human only, atomic revisions |
+| GET `/bindings?objectId=UUID` | Team-only source path, imported commit, object version and provider link |
+| GET `/pipelines` | Cached summaries; customers only see explicitly shared status without source URL/commit |
+
+Up to 20 connections per project, 12 roots, 200 Markdown files, 128 KiB per file and 4 MiB aggregate source text. The serialized changeset also must fit below the client response budget; oversized results fail rather than truncate. Local snapshot JSON bodies are limited to 8 MiB for encoding overhead. Identical latest snapshots are reused; mutations are not automatically retried. Provider refresh has a 15-second cooldown and request limits. Missing files never delete objects. Selected references must resolve atomically at apply time. See [repository synchronization](../agents/repository-sync.md) for examples, provenance and recovery.

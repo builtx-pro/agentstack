@@ -51,3 +51,7 @@ node packages/cli/dist/main.js --timeout-ms 300000 --project PROJECT_UUID import
 The value applies to each request, not the entire command. Human login remains capped at 30000 ms. The SDK's `createHumanSession` accepts the same optional `timeoutMs` and passes it to its authenticated client.
 
 A timeout can happen after the server commits an import. The CLI never automatically retries an uncertain mutation or rolls it back. Read the current catalog and reconcile the result before retrying; retain the reported uploaded file IDs for investigation.
+
+## Repository connections and CI
+
+Use `repositories list/get/pipelines/snapshots/snapshot` to inspect connections and staged changes. `repositories sync CONNECTION --repo DIR` previews committed HEAD; add `--stage` to submit it for human review. `repositories refresh CONNECTION` reads a configured GitHub/GitLab branch and stages provider data. Neither command applies changes. Use global `--project PROJECT --timeout-ms 120000` for provider refresh. See [repository sync, limits and CI templates](repository-sync.md).

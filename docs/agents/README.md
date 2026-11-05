@@ -15,7 +15,7 @@ The MCP server uses stdio locally and HTTPS to your AgentStack API. It is not a 
 
 ## Collaboration contract
 
-Read [the workflow](workflow.md), [CLI reference](cli.md), [MCP tools](mcp.md) and [Git exchange](git-exchange.md). Install the [portable agent kit](../../agent-kit/README.md) in the source repository you want agents to modify. A generated context bundle is a fallback for any model that can read text; it does not give that model direct access to your database.
+Read [the workflow](workflow.md), [CLI reference](cli.md), [MCP tools](mcp.md) and [Git exchange](git-exchange.md) and [repository synchronization](repository-sync.md). Install the [portable agent kit](../../agent-kit/README.md) in the source repository you want agents to modify. A generated context bundle is a fallback for any model that can read text; it does not give that model direct access to your database.
 
 Server authorization is the security boundary. Client guardrails help avoid mistakes but never replace project membership and token-scope checks.
 

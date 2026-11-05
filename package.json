@@ -1,6 +1,6 @@
 {
   "name": "agentstack",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "A shared workspace for humans and coding agents",
   "type": "module",
@@ -21,7 +21,7 @@
     "bootstrap": "npm run bootstrap --workspace @agentstack/server",
     "start": "npm run start --workspace @agentstack/server",
     "test:migration": "python3 -m unittest discover -s tools/migration -p \"test_*.py\"",
-    "test:setup": "node --test tools/setup/init-env.test.mjs"
+    "test:setup": "node --test tools/setup/*.test.mjs"
   },
   "devDependencies": {
     "typescript": "7.0.2",

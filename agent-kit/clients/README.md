@@ -23,3 +23,5 @@ Configuration formats were checked against these official references on 2026-11-
 - [VS Code MCP configuration](https://code.visualstudio.com/docs/agents/reference/mcp-configuration): `servers` versus portable `mcpServers` formats.
 
 Templates are examples for an installed local checkout. No npm package publication or one-click marketplace installation is implied.
+
+For repository context and pipeline status, discover `list_repositories` and `get_repository_pipelines`. An explicit `refresh_repository` call stages source for human review; it does not apply it. Set `AGENTSTACK_TIMEOUT_MS=120000` in the MCP process environment when using provider refresh, and allow a matching host tool timeout. Follow [repository synchronization](../../docs/agents/repository-sync.md) for safe CLI source reads and opt-in GitHub/GitLab CI templates. These instructions apply to all clients above without client-specific automation privileges.

@@ -44,6 +44,7 @@ services:
       DATABASE_URL: postgresql://agentstack_app:${APP_DATABASE_PASSWORD}@database:5432/agentstack
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:4311}
       TRUST_PROXY: ${TRUST_PROXY:-}
+      REPOSITORY_ENCRYPTION_KEY: ${REPOSITORY_ENCRYPTION_KEY:-}
     depends_on:
       migrate:
         condition: service_completed_successfully

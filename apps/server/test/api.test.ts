@@ -1817,8 +1817,413 @@ it("upgrades v2 claims with explicitly unknown rules and preserves original hist
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT status,version,claimed_rule_revisions FROM notes WHERE id=$1",[noteId])).rows[0]).toEqual({status:"in_progress",version:2,claimed_rule_revisions:null});
     expect((await old.query("SELECT snapshot FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].snapshot).toEqual(historical);
-    expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(3);
+    expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(4);
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT count(*)::int AS count FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].count).toBe(1);
   }finally{await old?.end();if(created)await owner.query(`DROP DATABASE ${databaseName}`);await owner.end();}
 });
+
+describe('repository connections and reviewed synchronization',()=>{
+ const sha='a'.repeat(40);
+ const source=(body:string)=>({path:'docs/spec.md',content:`---\nid: DOC-SPEC\ntitle: Spec\n---\n${body}`});
+ const create=async()=>{const r=await req('POST',`/projects/${pid}/repositories`,{provider:'local',repository:'test-source',branch:'main',label:'Source',roots:['docs','epics','AGENTS.md']});expect(r.statusCode,r.body).toBe(201);return r.json();};
+ it('restricts configuration and hides private paths from customers',async()=>{
+  const config={provider:'local',repository:'private-name',branch:'main',label:'Source'};
+  expect((await req('POST',`/projects/${pid}/repositories`,config,developer)).statusCode).toBe(403);
+  const c=await create();expect((await req('GET',`/projects/${pid}/repositories/${c.id}`,undefined,customer)).statusCode).toBe(403);
+  expect((await req('GET',`/projects/${pid2}/repositories/${c.id}`)).statusCode).toBe(404);
+  expect((await req('PATCH',`/projects/${pid}/repositories/${c.id}`,{expectedVersion:2,label:'Stale'})).statusCode).toBe(409);
+  expect((await req('POST',`/projects/${pid}/repositories`,{provider:'github',repository:'owner/repo',branch:'main',label:'Private',token:'synthetic-secret'})).statusCode).toBe(503);
+ });
+ it('stages agent proposals but only human applies, detects conflicts and preserves notes',async()=>{
+  const c=await create(),base=`/projects/${pid}/repositories/${c.id}`;
+  const token=(await req('POST',`/projects/${pid}/tokens`,{name:'Repository stager',scopes:['read','write']})).json().token,bearer={authorization:`Bearer ${token}`};
+  const stage=async(content:string)=>{const r=await req('POST',base+'/snapshots',{expectedVersion:1,branch:'main',commit:sha,files:[source(content)]},'',bearer);expect(r.statusCode,r.body).toBe(201);expect(r.json().source).toBe('reported');return r.json();};
+  const first=await stage('Initial content');expect(first.counts.new).toBe(1);
+  const selection={expectedVersion:1,entries:[{key:'DOC-SPEC',expectedObjectVersion:null}]};
+  expect((await req('POST',base+`/snapshots/${first.id}/apply`,selection,'',bearer)).statusCode).toBe(403);
+  const applied=await req('POST',base+`/snapshots/${first.id}/apply`,selection,developer);expect(applied.statusCode,applied.body).toBe(200);const object=applied.json().objects[0];
+  const note=await req('POST',`/projects/${pid}/notes`,{targetId:object.id,targetVersion:object.version,body:'Keep this discussion'},developer,{'idempotency-key':randomUUID()});expect(note.statusCode,note.body).toBe(201);
+  expect((await req('PATCH',`/projects/${pid}/objects/${object.id}`,{expectedVersion:1,title:'Web edited title'})).statusCode).toBe(200);
+  const unchanged=await stage('Initial content');expect(unchanged.counts.unchanged).toBe(1);
+  const second=await stage('Repository content changed');expect(second.counts.conflict).toBe(1);
+  const resolve={expectedVersion:1,entries:[{key:'DOC-SPEC',expectedObjectVersion:2}]};
+  expect((await req('POST',base+`/snapshots/${second.id}/apply`,resolve)).statusCode).toBe(409);
+  expect((await req('POST',base+`/snapshots/${second.id}/apply`,{...resolve,entries:[{...resolve.entries[0],resolveConflict:true,expectedObjectVersion:1}]})).statusCode).toBe(409);
+  const resolved=await req('POST',base+`/snapshots/${second.id}/apply`,{...resolve,entries:[{...resolve.entries[0],resolveConflict:true}]});expect(resolved.statusCode,resolved.body).toBe(200);expect(resolved.json().objects[0].id).toBe(object.id);
+  expect((await req('GET',`/projects/${pid}/notes?targetId=${object.id}`)).json().items.some((n:any)=>n.id===note.json().id)).toBe(true);
+  const missing=await req('POST',base+'/snapshots',{expectedVersion:1,branch:'main',commit:sha,files:[{path:'docs/other.md',content:'# Other'}]});expect(missing.json().counts.missing).toBe(1);expect((await req('GET',`/projects/${pid}/objects/${object.id}`)).json().archived).toBe(false);
+  await req('PATCH',base,{expectedVersion:1,branch:'release'});expect((await req('POST',base+`/snapshots/${second.id}/apply`,{...resolve,expectedVersion:2})).statusCode).toBe(409);
+ });
+ it('resolves selected epic/story hierarchy atomically and shares only sanitized pipelines',async()=>{
+  const c=await create(),base=`/projects/${pid}/repositories/${c.id}`;
+  const staged=await req('POST',base+'/snapshots',{expectedVersion:1,branch:'main',commit:sha,files:[{path:'epics/epic.md',content:'---\nid: EPIC-TEST\ntitle: Parent\n---\n# Parent'},{path:'epics/story.md',content:'---\nid: STORY-TEST\nepic: EPIC-TEST\ntitle: Child\nstatus: done\n---\n- [x] Completed'}],pipelines:[{id:'1',name:'Tests',status:'passed',commit:sha,url:'https://github.com/private/repo/actions/runs/1',updatedAt:'2026-11-05T00:00:00Z',source:'provider'}]});expect(staged.statusCode,staged.body).toBe(201);const s=staged.json();expect(s.pipelines[0].source).toBe('reported');
+  const partial=await req('POST',base+`/snapshots/${s.id}/apply`,{expectedVersion:1,entries:[{key:'STORY-TEST',expectedObjectVersion:null}]});expect(partial.statusCode).toBe(422);
+  const all=await req('POST',base+`/snapshots/${s.id}/apply`,{expectedVersion:1,entries:s.entries.map((e:any)=>({key:e.key,expectedObjectVersion:null}))});expect(all.statusCode,all.body).toBe(200);expect(all.json().applied).toBe(4);const epic=all.json().objects.find((o:any)=>o.kind==='epic'),story=all.json().objects.find((o:any)=>o.kind==='story');expect(story.data.epicId).toBe(epic.id);expect(story.status).toBe('done');
+  expect((await req('GET',`/projects/${pid}/repositories/pipelines`,undefined,customer)).json().items).toHaveLength(0);
+  await req('PATCH',base,{expectedVersion:1,sharePipelines:true});const shared=(await req('GET',`/projects/${pid}/repositories/pipelines`,undefined,customer)).json();expect(shared.items[0].pipelines[0].status).toBe('passed');expect(JSON.stringify(shared)).not.toContain('private/repo');expect(shared.items[0].pipelines[0].commit).toBeUndefined();
+  await req('PATCH',base,{expectedVersion:2,archived:true});expect((await req('GET',base+`/snapshots/${s.id}`)).statusCode).toBe(200);expect((await req('POST',base+'/snapshots',{expectedVersion:3,branch:'main',commit:sha,files:[source('x')]})).statusCode).toBe(409);
+ });
+ it('enforces tenant RLS and immutable snapshot history directly in the app role',async()=>{
+  const c=await create();const pool=new Pool({connectionString:process.env.TEST_DATABASE_URL});const client=await pool.connect();
+  try{await client.query('BEGIN');await client.query("SELECT set_config('agentstack.project_id',$1,true)",[pid2]);expect((await client.query('SELECT id FROM repository_connections WHERE id=$1',[c.id])).rowCount).toBe(0);await client.query('ROLLBACK');}finally{client.release();await pool.end();}
+ });
+});
+
+it('encrypts repository credentials, records sanitized config history and refreshes outside the request transaction',async()=>{
+ const sha='d'.repeat(40),tree='e'.repeat(40),blob='f'.repeat(40);let calls=0;
+ const remote=await buildApp({databaseUrl:process.env.TEST_DATABASE_URL!,allowedOrigin:origin,storageDir:storage,secureCookies:false,logger:false,repositoryEncryptionKey:Buffer.alloc(32,7).toString('base64'),repositoryFetch:async(url,init)=>{calls++;expect((init?.headers as any).Authorization).toBe('Bearer synthetic-private-token');const u=String(url);const data=u.includes('/commits/')?{sha,commit:{tree:{sha:tree}}}:u.includes('/trees/')?{truncated:false,tree:[{path:'docs/a.md',type:'blob',mode:'100644',sha:blob}]}:u.includes('/blobs/')?{encoding:'base64',content:Buffer.from('# Remote document').toString('base64')}:{workflow_runs:[]};return new Response(JSON.stringify(data));}});
+ const call=(method:string,url:string,payload?:unknown)=>remote.inject({method:method as 'GET',url:'/api/v1'+url,payload:payload===undefined?undefined:JSON.stringify(payload),headers:{'content-type':'application/json',origin,cookie:admin,'x-agentstack-request':'1'}});
+ const owner=new Pool({connectionString:process.env.TEST_DATABASE_OWNER_URL});
+ try{
+  const created=await call('POST',`/projects/${pid}/repositories`,{provider:'github',repository:'owner/repo',branch:'main',label:'Private remote',roots:['docs'],token:'synthetic-private-token'});expect(created.statusCode,created.body).toBe(201);const c=created.json();expect(c.hasCredential).toBe(true);expect(created.body).not.toContain('synthetic-private-token');const stored=(await owner.query('SELECT credential_ciphertext FROM repository_connections WHERE id=$1',[c.id])).rows[0].credential_ciphertext;expect(stored).not.toContain('synthetic-private-token');expect(stored).toMatch(/^v1\./);
+  const refreshed=await call('POST',`/projects/${pid}/repositories/${c.id}/refresh`,{expectedVersion:1});expect(refreshed.statusCode,refreshed.body).toBe(201);expect(refreshed.json().source).toBe('provider');expect(refreshed.json().counts.new).toBe(1);expect(calls).toBe(4);
+  expect((await call('POST',`/projects/${pid}/repositories/${c.id}/refresh`,{expectedVersion:1})).statusCode).toBe(429);expect(calls).toBe(4);
+  const snapshotId=refreshed.json().id;
+  const accepted=await call('POST',`/projects/${pid}/repositories/${c.id}/snapshots/${snapshotId}/apply`,{expectedVersion:1,entries:refreshed.json().entries.map((entry:any)=>({key:entry.key,expectedObjectVersion:null}))});expect(accepted.statusCode,accepted.body).toBe(200);
+  const imported=accepted.json().objects[0];const linked=await req('GET',`/projects/${pid}/repositories/bindings?objectId=${imported.id}`,undefined,developer);expect(linked.statusCode,linked.body).toBe(200);expect(linked.json().items[0].sourceUrl).toBe(`https://github.com/owner/repo/blob/${sha}/docs/a.md`);expect(linked.json().items[0].commit).toBe(sha);
+  await expect(owner.query('UPDATE repository_snapshots SET branch=$1 WHERE id=$2',['changed',snapshotId])).rejects.toThrow('immutable_history');
+  await call('PATCH',`/projects/${pid}/repositories/${c.id}`,{expectedVersion:1,label:'Updated name',token:null});const audit=(await owner.query('SELECT data FROM audit_events WHERE target_id=$1 ORDER BY created_at',[c.id])).rows;expect(JSON.stringify(audit)).not.toContain('synthetic-private-token');expect(JSON.stringify(audit)).not.toContain(stored);expect(audit.at(-1).data.previous.label).toBe('Private remote');expect(audit.at(-1).data.connection.label).toBe('Updated name');
+ }finally{await remote.close();await owner.end();}
+});
+
+it('rejects oversized repository changesets before storing snapshots',async()=>{
+ const created=await req('POST',`/projects/${pid}/repositories`,{provider:'local',repository:'bounded',branch:'main',label:'Bounded',roots:['docs']});const c=created.json();const pool=new Pool({connectionString:process.env.TEST_DATABASE_OWNER_URL});
+ try{const files=Array.from({length:32},(_,i)=>({path:`docs/${i}.md`,content:'\\'.repeat(120000)}));const r=await req('POST',`/projects/${pid}/repositories/${c.id}/snapshots`,{expectedVersion:1,branch:'main',commit:'b'.repeat(40),files});expect(r.statusCode,r.body).toBe(413);expect(r.json().error.code).toBe('repository_snapshot_too_large');expect((await pool.query('SELECT count(*)::int AS n FROM repository_snapshots WHERE connection_id=$1',[c.id])).rows[0].n).toBe(0);}finally{await pool.end();}
+});
+
+it("enforces repository tenant reads and WITH CHECK on all three tables with positive controls", async () => {
+  const c = (
+    await req("POST", `/projects/${pid}/repositories`, {
+      provider: "local",
+      repository: "rls-proof",
+      branch: "main",
+      label: "RLS proof",
+      roots: ["docs"],
+    })
+  ).json();
+  const base = `/projects/${pid}/repositories/${c.id}`;
+  const staged = await req("POST", base + "/snapshots", {
+    expectedVersion: 1,
+    branch: "main",
+    commit: "a".repeat(40),
+    files: [
+      { path: "docs/proof.md", content: "---\nid: RLS-PROOF\n---\n# Proof" },
+    ],
+  });
+  expect(staged.statusCode, staged.body).toBe(201);
+  const snapshot = staged.json();
+  const applied = await req("POST", base + `/snapshots/${snapshot.id}/apply`, {
+    expectedVersion: 1,
+    entries: [{ key: "RLS-PROOF", expectedObjectVersion: null }],
+  });
+  expect(applied.statusCode, applied.body).toBe(200);
+  const object = applied.json().objects[0];
+  const pool = new Pool({ connectionString: process.env.TEST_DATABASE_URL }),
+    client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("SELECT set_config('agentstack.project_id',$1,true)", [
+      pid,
+    ]);
+    for (const table of [
+      "repository_connections",
+      "repository_snapshots",
+      "repository_bindings",
+    ])
+      expect(
+        (
+          await client.query(`SELECT * FROM ${table} WHERE project_id=$1`, [
+            pid,
+          ])
+        ).rowCount,
+      ).toBeGreaterThan(0);
+    const actor = (
+      await client.query(
+        "SELECT created_by FROM repository_connections WHERE id=$1",
+        [c.id],
+      )
+    ).rows[0].created_by;
+    await client.query("SELECT set_config('agentstack.project_id',$1,true)", [
+      pid2,
+    ]);
+    for (const table of [
+      "repository_connections",
+      "repository_snapshots",
+      "repository_bindings",
+    ])
+      expect(
+        (
+          await client.query(`SELECT * FROM ${table} WHERE project_id=$1`, [
+            pid,
+          ])
+        ).rowCount,
+      ).toBe(0);
+    const forbiddenWrites = [
+      () =>
+        client.query(
+          "INSERT INTO repository_connections(id,project_id,provider,repository,branch,label,roots,created_by) VALUES($1,$2,'local','rls','main','RLS',ARRAY['docs'],$3)",
+          [randomUUID(), pid, actor],
+        ),
+      () =>
+        client.query(
+          "INSERT INTO repository_snapshots(id,project_id,connection_id,config_version,branch,commit_sha,source,drafts,pipelines,actor_id) VALUES($1,$2,$3,1,'main',$4,'reported','[]','[]',$5)",
+          [randomUUID(), pid, c.id, "a".repeat(40), actor],
+        ),
+      () =>
+        client.query(
+          "INSERT INTO repository_bindings(project_id,connection_id,source_key,source_path,object_id,source_hash,object_hash,object_version,commit_sha,snapshot_id) VALUES($1,$2,'forged','docs/forged.md',$3,'a','b',1,$4,$5)",
+          [pid, c.id, object.id, "a".repeat(40), snapshot.id],
+        ),
+    ];
+    for (const write of forbiddenWrites) {
+      await client.query("SAVEPOINT rls_check");
+      await expect(write()).rejects.toMatchObject({ code: "42501" });
+      await client.query("ROLLBACK TO SAVEPOINT rls_check");
+    }
+    await client.query("SELECT set_config('agentstack.project_id',$1,true)", [
+      pid,
+    ]);
+    for (const table of ["repository_connections", "repository_bindings"]) {
+      await client.query("SAVEPOINT rls_check");
+      await expect(
+        client.query(`UPDATE ${table} SET project_id=$2 WHERE project_id=$1`, [
+          pid,
+          pid2,
+        ]),
+      ).rejects.toMatchObject({ code: "42501" });
+      await client.query("ROLLBACK TO SAVEPOINT rls_check");
+    }
+    await client.query("SAVEPOINT rls_check");
+    await expect(
+      client.query("UPDATE repository_snapshots SET branch=$1 WHERE id=$2", [
+        "forbidden",
+        snapshot.id,
+      ]),
+    ).rejects.toMatchObject({ code: "42501" });
+    await client.query("ROLLBACK TO SAVEPOINT rls_check");
+    await client.query("ROLLBACK");
+  } finally {
+    client.release();
+    await pool.end();
+  }
+  const team = await req(
+    "GET",
+    `/projects/${pid}/repositories/bindings?objectId=${object.id}`,
+    undefined,
+    developer,
+  );
+  expect(team.statusCode, team.body).toBe(200);
+  expect(team.json().items[0]).toMatchObject({
+    connectionId: c.id,
+    objectId: object.id,
+    path: "docs/proof.md",
+    commit: "a".repeat(40),
+    lastAppliedVersion: 1,
+  });
+  expect(team.json().items[0].sourceUrl).toBeUndefined();
+  expect(
+    (
+      await req(
+        "GET",
+        `/projects/${pid}/repositories/bindings?objectId=${object.id}`,
+        undefined,
+        customer,
+      )
+    ).statusCode,
+  ).toBe(403);
+  expect(
+    (
+      await req(
+        "GET",
+        `/projects/${pid2}/repositories/bindings?objectId=${object.id}`,
+      )
+    ).json().items,
+  ).toEqual([]);
+});
+
+it.each(["token", "session", "membership", "configuration"])(
+  "reauthorizes refresh after provider wait: %s revoked or changed",
+  async (mode) => {
+    const project = (
+      await req("POST", "/projects", {
+        name: `Refresh ${mode}`,
+        slug: `refresh-${mode}`,
+      })
+    ).json();
+    const c = (
+      await req("POST", `/projects/${project.id}/repositories`, {
+        provider: "github",
+        repository: "owner/repo",
+        branch: "main",
+        label: "Paused source",
+        roots: ["docs"],
+      })
+    ).json();
+    let cookie = admin,
+      bearer: Record<string, string> = {},
+      tokenId = "";
+    if (mode === "membership") {
+      const m = await req("POST", `/projects/${project.id}/members`, {
+        userId: devId,
+        role: "developer",
+      });
+      expect(m.statusCode, m.body).toBe(201);
+      cookie = developer;
+    }
+    if (mode === "token") {
+      const token = (
+        await req("POST", `/projects/${project.id}/tokens`, {
+          name: "Revocable source",
+          scopes: ["read", "write"],
+        })
+      ).json();
+      tokenId = token.id;
+      bearer = { authorization: `Bearer ${token.token}` };
+      cookie = "";
+    }
+    if (mode === "session") {
+      const session = await req(
+        "POST",
+        "/auth/login",
+        { email: "admin@example.test", password: "a-random-test-password-1" },
+        "",
+      );
+      cookie = String(session.headers["set-cookie"]).split(";")[0]!;
+    }
+    let enter!: () => void, resume!: () => void;
+    const entered = new Promise<void>((r) => {
+        enter = r;
+      }),
+      paused = new Promise<void>((r) => {
+        resume = r;
+      });
+    const sha = "a".repeat(40);
+    const remote = await buildApp({
+      databaseUrl: process.env.TEST_DATABASE_URL!,
+      allowedOrigin: origin,
+      storageDir: storage,
+      secureCookies: false,
+      logger: false,
+      repositoryFetch: async (url) => {
+        const u = String(url);
+        if (u.includes("/commits/")) {
+          enter();
+          await paused;
+          return new Response(
+            JSON.stringify({ sha, commit: { tree: { sha } } }),
+          );
+        }
+        if (u.includes("/trees/"))
+          return new Response(
+            JSON.stringify({
+              truncated: false,
+              tree: [{ path: "docs/a.md", type: "blob", mode: "100644", sha }],
+            }),
+          );
+        if (u.includes("/blobs/"))
+          return new Response(
+            JSON.stringify({
+              encoding: "base64",
+              content: Buffer.from("# Paused document").toString("base64"),
+            }),
+          );
+        return new Response(JSON.stringify({ workflow_runs: [] }));
+      },
+    });
+    const owner = new Pool({
+      connectionString: process.env.TEST_DATABASE_OWNER_URL,
+    });
+    try {
+      const pending = remote
+        .inject({
+          method: "POST",
+          url: `/api/v1/projects/${project.id}/repositories/${c.id}/refresh`,
+          payload: { expectedVersion: 1 },
+          headers: { origin, cookie, "x-agentstack-request": "1", ...bearer },
+        })
+        .then((r) => r);
+      await entered;
+      if (mode === "token")
+        expect(
+          (await req("DELETE", `/projects/${project.id}/tokens/${tokenId}`, {}))
+            .statusCode,
+        ).toBe(200);
+      if (mode === "session")
+        expect((await req("POST", "/auth/logout", {}, cookie)).statusCode).toBe(
+          200,
+        );
+      if (mode === "membership")
+        expect(
+          (
+            await req("DELETE", `/projects/${project.id}/members/${devId}`, {
+              expectedVersion: 1,
+            })
+          ).statusCode,
+        ).toBe(200);
+      if (mode === "configuration")
+        expect(
+          (
+            await req("PATCH", `/projects/${project.id}/repositories/${c.id}`, {
+              expectedVersion: 1,
+              branch: "release",
+            })
+          ).statusCode,
+        ).toBe(200);
+      resume();
+      const result = await pending;
+      expect(result.statusCode, result.body).toBe(
+        mode === "membership" ? 404 : mode === "configuration" ? 409 : 401,
+      );
+      expect(
+        (
+          await owner.query(
+            "SELECT count(*)::int AS n FROM repository_snapshots WHERE connection_id=$1",
+            [c.id],
+          )
+        ).rows[0].n,
+      ).toBe(0);
+    } finally {
+      resume();
+      await remote.close();
+      await owner.end();
+    }
+  },
+);
+
+it("applies all 600 drafts produced by 200 epic files with unique milestones", async () => {
+  const c = (
+      await req("POST", `/projects/${pid}/repositories`, {
+        provider: "local",
+        repository: "large-plan",
+        branch: "main",
+        label: "Large plan",
+        roots: ["epics"],
+      })
+    ).json(),
+    base = `/projects/${pid}/repositories/${c.id}`;
+  const staged = await req("POST", base + "/snapshots", {
+    expectedVersion: 1,
+    branch: "main",
+    commit: "c".repeat(40),
+    files: Array.from({ length: 200 }, (_, i) => ({
+      path: `epics/${i}.md`,
+      content: `---\nid: EPIC-BULK-${i}\ntitle: Epic ${i}\nmilestone: Wave ${i}\n---\n# Delivery ${i}`,
+    })),
+  });
+  expect(staged.statusCode, staged.body).toBe(201);
+  const s = staged.json();
+  expect(s.entries).toHaveLength(600);
+  const result = await req("POST", base + `/snapshots/${s.id}/apply`, {
+    expectedVersion: 1,
+    entries: s.entries.map((e: any) => ({
+      key: e.key,
+      expectedObjectVersion: null,
+    })),
+  });
+  expect(result.statusCode, result.body).toBe(200);
+  expect(result.json().applied).toBe(600);
+  expect(
+    result.json().objects.filter((o: any) => o.kind === "wave"),
+  ).toHaveLength(200);
+}, 30000);

@@ -13,6 +13,7 @@ import {
 } from "@agentstack/sdk";
 import { z } from "zod";
 import { toolResult } from "./result.util.js";
+import { registerRepositoryTools } from "./repository-tools.service.js";
 import { WORKFLOW } from "./workflow.constant.js";
 
 const projectInput = {
@@ -45,9 +46,10 @@ const writeAnnotations = {
 
 export function createMcpServer(api: AgentStackClient): McpServer {
   const server = new McpServer(
-    { name: "agentstack", version: "0.1.0" },
+    { name: "agentstack", version: "0.2.0" },
     { instructions: WORKFLOW },
   );
+  registerRepositoryTools(server, api);
   server.registerTool(
     "get_capabilities",
     {

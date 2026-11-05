@@ -1,3 +1,5 @@
+import { registerRepositoryRoutes } from "./repositories/repository.routes.js";
+import type { RepositoryFetch } from "./repositories/repository-provider.service.js";
 import Fastify, { type FastifyRequest } from "fastify";
 import cookie from "@fastify/cookie";
 import multipart from "@fastify/multipart";
@@ -62,6 +64,8 @@ export interface ServerConfig {
   trustProxy?: string;
   apiRateLimit?: number;
   authRateLimit?: number;
+  repositoryEncryptionKey?: string;
+  repositoryFetch?: RepositoryFetch;
 }
 declare module "fastify" {
   interface FastifyRequest {
@@ -608,6 +612,7 @@ export async function buildApp(config: ServerConfig) {
         importManifest(ctx, parse(importSchema, r.body)),
       ),
   );
+  registerRepositoryRoutes(app, database, { encryptionKey: config.repositoryEncryptionKey, fetch: config.repositoryFetch });
   if (config.webDist) {
     await app.register(staticPlugin, {
       root: resolve(config.webDist),

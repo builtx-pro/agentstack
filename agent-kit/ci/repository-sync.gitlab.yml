@@ -1,0 +1,37 @@
+# Include this job in the SOURCE project's .gitlab-ci.yml.
+# Add AGENTSTACK_ENGINE_REF (40-char reviewed engine commit), URL, PROJECT,
+# CONNECTION as protected CI variables; TOKEN must be protected and masked.
+# Set AGENTSTACK_SYNC_MODE=local to stage committed files without a provider token.
+agentstack_repository_sync:
+  image: node:22-bookworm-slim
+  stage: .post
+  timeout: 8m
+  resource_group: agentstack-repository-sync
+  variables:
+    AGENTSTACK_SYNC_MODE: provider
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "web"'
+      when: always
+  before_script:
+    - apt-get update -qq && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*
+  script:
+    - |
+      set -eu
+      node -e 'if (!/^[a-f0-9]{40}$/.test(process.env.AGENTSTACK_ENGINE_REF || "")) process.exit(1)'
+      AGENTSTACK_ENGINE_DIR="$(mktemp -d)"
+      trap 'rm -rf "$AGENTSTACK_ENGINE_DIR"' EXIT
+      git -C "$AGENTSTACK_ENGINE_DIR" init --quiet
+      git -C "$AGENTSTACK_ENGINE_DIR" remote add origin https://github.com/builtx-pro/agentstack.git
+      git -C "$AGENTSTACK_ENGINE_DIR" fetch --quiet --depth=1 origin "$AGENTSTACK_ENGINE_REF"
+      git -C "$AGENTSTACK_ENGINE_DIR" checkout --quiet --detach FETCH_HEAD
+      cd "$AGENTSTACK_ENGINE_DIR"
+      npm ci --ignore-scripts
+      npm run build --workspace @agentstack/sdk
+      npm run build --workspace @agentstack/cli
+      case "$AGENTSTACK_SYNC_MODE" in
+        provider) node packages/cli/dist/main.js --project "$AGENTSTACK_PROJECT" --timeout-ms 120000 repositories refresh "$AGENTSTACK_CONNECTION" ;;
+        local) node packages/cli/dist/main.js --project "$AGENTSTACK_PROJECT" --timeout-ms 120000 repositories sync "$AGENTSTACK_CONNECTION" --repo "$CI_PROJECT_DIR" --branch "$CI_COMMIT_BRANCH" --stage ;;
+        *) echo 'AGENTSTACK_SYNC_MODE must be provider or local' >&2; exit 1 ;;
+      esac
