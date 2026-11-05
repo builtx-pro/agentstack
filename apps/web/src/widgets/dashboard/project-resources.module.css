@@ -1,0 +1,6 @@
+.card { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.icon { flex-shrink: 0; color: var(--mantine-color-violet-5); margin-top: 2px; }
+.title, .description { overflow-wrap: anywhere; }
+.footer { margin-top: auto; padding-top: 4px; }
+.button { height: auto; min-height: 36px; padding-block: 8px; }
+.button :global(.mantine-Button-label) { white-space: normal; text-align: left; overflow-wrap: anywhere; }
