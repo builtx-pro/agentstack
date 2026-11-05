@@ -2,7 +2,7 @@
 id: STORY-013-03
 epic: EPIC-013
 title: Navigate a cohesive illustrated workspace
-status: review
+status: done
 blocked: false
 priority: must
 milestone: M4
@@ -19,6 +19,8 @@ Given an unauthorized actor or stale version, the operation fails without disclo
 
 - [x] Behavioral tests and applicable API/database checks pass.
 - [x] Real browser checks pass in RU/EN and desktop/mobile where applicable.
-- [ ] Documentation, deployment and preservation evidence are recorded.
+- [x] Documentation, deployment and preservation evidence are recorded.
 
 [Detailed contract](../../../docs/product/workspace-experience.md)
+
+[Release verification](../../../docs/releases/0.3.0-verification.md).

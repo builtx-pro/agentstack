@@ -26,6 +26,8 @@ Saving a comment does not launch an LLM or spend provider credits. AgentStack co
 | Knowledge | Markdown documents, agent rules, editable checklists, history and restoration |
 | Planning | Waves, epics, sprints, stories, features and proposals converted into work |
 | Progress | Counts from actual stories, group progress, historical scope and activity |
+| Account | Profile and avatar, RU/EN, personal accent, light/dark/system theme, password, sessions and optional authenticator MFA |
+| Onboarding | First-login introduction, 11 practical chapters and a checklist based on real project materials |
 | Access | Multiple private projects, administrator/developer/customer roles and scoped expiring tokens |
 | History | Immutable revision records, archive/unarchive, optimistic conflicts and content restoration |
 | Agents | TypeScript SDK, CLI, stdio MCP, portable context and agent recipes |

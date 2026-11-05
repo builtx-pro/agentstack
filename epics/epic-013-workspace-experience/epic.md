@@ -1,7 +1,7 @@
 ---
 id: EPIC-013
 title: Personal workspace and guided adoption
-status: in-progress
+status: review
 blocked: false
 priority: must
 milestone: M4
@@ -10,4 +10,4 @@ milestone: M4
 
 Install a private workspace with a guided first-run experience; review ordered catalogs in RU/EN and use a personalized, secure account. [Acceptance contract](../../docs/product/workspace-experience.md).
 
-Implementation is in progress. Verified completion is recorded per story after tests and release checks.
+Implemented and deployed; verification is recorded per story and in the [release report](../../docs/releases/0.3.0-verification.md). The complete clean systemd VPS/apt/public ACME rehearsal remains unverified, so the installation story stays in review.

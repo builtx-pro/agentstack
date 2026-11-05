@@ -19,8 +19,10 @@ Given an unauthorized actor or stale version, the operation fails without disclo
 
 - [x] Behavioral tests and applicable API/database checks pass.
 - [x] Real browser checks pass in RU/EN and desktop/mobile where applicable.
-- [ ] Documentation, deployment and preservation evidence are recorded.
+- [x] Documentation, deployment and preservation evidence are recorded.
 
 [Detailed contract](../../../docs/product/workspace-experience.md)
 
 Clean systemd VPS/apt/public ACME execution remains unverified; see the release verification limits.
+
+[Release verification](../../../docs/releases/0.3.0-verification.md).
