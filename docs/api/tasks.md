@@ -4,7 +4,7 @@ All endpoints use `/api/v1`. A personal board requires a human session. Project-
 
 ## Personal board
 
-`GET /tasks?source=all|personal|assigned&status=&q=&archived=false|true|all&limit=50&cursor=` returns `{items,nextCursor}`. The default source is `all`, default archive filter is `false`, and the maximum page size is 100. Follow the opaque cursor; ordering is source then stable UUID. Search matches title, description and tags literally, case-insensitively. Assigned tasks belong only to currently accessible, unarchived projects; customer members see only customer-visible assignments. Membership revocation takes effect on the next request. Archival filtering refers to each task's own archived flag.
+`GET /tasks?source=all&archived=false&limit=50` returns `{items,nextCursor}`. Optional filters: `source=all|personal|assigned`, `status`, `q`, `archived=false|true|all` and opaque `cursor`. Omit empty optional filters. The default source is `all`, default archive filter is `false`, and the maximum page size is 100. Follow the opaque cursor; ordering is source then stable UUID. Search matches title, description and tags literally, case-insensitively. Assigned tasks belong only to currently accessible, unarchived projects; customer members see only customer-visible assignments. Membership revocation takes effect on the next request. Archival filtering refers to each task's own archived flag.
 
 Each item is:
 

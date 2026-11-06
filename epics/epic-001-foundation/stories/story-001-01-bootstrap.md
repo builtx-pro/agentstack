@@ -2,6 +2,7 @@
 id: STORY-001-01
 epic: EPIC-001
 title: Create the first administrator
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

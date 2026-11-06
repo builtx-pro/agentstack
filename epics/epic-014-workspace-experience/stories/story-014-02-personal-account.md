@@ -2,6 +2,7 @@
 id: STORY-014-02
 epic: EPIC-014
 title: Personalize and secure an account
+sprint: SPRINT-006
 status: done
 blocked: false
 priority: must

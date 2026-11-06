@@ -1,0 +1,84 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(250px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 4px 20px;
+  scroll-snap-type: x proximity;
+  align-items: start;
+}
+.column {
+  min-width: 0;
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+  background: var(--app-bg);
+  padding: 14px;
+  scroll-snap-align: start;
+}
+.column:focus-within {
+  border-color: var(--app-accent-text);
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card {
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 3%);
+  overflow-wrap: anywhere;
+}
+.card[draggable="true"] {
+  cursor: grab;
+}
+.card[draggable="true"]:active {
+  cursor: grabbing;
+}
+.title {
+  font: inherit;
+  font-weight: 650;
+  line-height: 1.45;
+  color: inherit;
+  border: 0;
+  padding: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  max-width: 100%;
+}
+.title:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.empty {
+  padding: 20px 4px;
+  color: var(--mantine-color-dimmed);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+.toolbar > * {
+  flex: 1 1 180px;
+}
+.toolbar > :first-child {
+  flex: 2 1 240px;
+}
+.agentBoard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(280px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  align-items: start;
+}

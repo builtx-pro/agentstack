@@ -138,7 +138,6 @@ export function RepositoryConnection({
           {snapshots.error ? (
             <Alert color="orange">{t("Snapshot history is unavailable.")}{" "}
               <Button
-                size="xs"
                 variant="subtle"
                 onClick={() => void snapshots.refetch()}
               >{t("Reload snapshots")}</Button>
@@ -152,7 +151,6 @@ export function RepositoryConnection({
                     {snapshot.source === "provider" ? t("Provider") : t("Reported")}
                   </Text>
                   <Button
-                    size="compact-xs"
                     variant="subtle"
                     onClick={() => onPreview(snapshot.id)}
                   >{t("Review snapshot")}</Button>
@@ -192,7 +190,6 @@ export function RepositoryConnection({
                   />
                   <Group>
                     <Button
-                      size="xs"
                       variant="light"
                       disabled={!token}
                       loading={actions.patch.isPending}
@@ -204,7 +201,6 @@ export function RepositoryConnection({
                     >{t("Replace token")}</Button>
                     {connection.hasCredential && (
                       <Button
-                        size="xs"
                         variant="subtle"
                         color="red"
                         loading={actions.patch.isPending}

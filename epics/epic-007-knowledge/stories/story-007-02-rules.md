@@ -2,6 +2,7 @@
 id: STORY-007-02
 epic: EPIC-007
 title: Review proposed rule changes
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

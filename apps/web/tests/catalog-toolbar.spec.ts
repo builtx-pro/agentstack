@@ -6,10 +6,10 @@ async function assertControls(page:Page) {
   for(const label of labels){
     const bounds=await page.getByRole(label==='Search screens'?'textbox':'combobox',{name:label,exact:true}).boundingBox();
     expect(bounds,label).not.toBeNull();
-    expect(bounds!.height,`${label} height`).toBe(36);
+    expect(bounds!.height,`${label} height`).toBe(42);
   }
   const layout=page.getByLabel('Catalog layout',{exact:true});
-  expect((await layout.boundingBox())!.height).toBe(36);
+  expect((await layout.boundingBox())!.height).toBe(42);
   for(const label of ['Flows','Grid']) {
     const content=layout.getByText(label,{exact:true});
     const geometry=await content.evaluate(node=>{

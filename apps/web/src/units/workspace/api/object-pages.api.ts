@@ -15,9 +15,9 @@ export async function getDocumentPage(
 ) {
   const params = new URLSearchParams({
     kind: filters.kind,
-    q: filters.q,
-    tag: filters.tag,
-    status: filters.status,
+    ...(filters.q ? {q:filters.q} : {}),
+    ...(filters.tag ? {tag:filters.tag} : {}),
+    ...(filters.status ? {status:filters.status} : {}),
     archived: String(filters.archived),
     limit: "30",
   });

@@ -2,6 +2,7 @@
 id: STORY-005-01
 epic: EPIC-005
 title: Find and discuss assets
+sprint: SPRINT-002
 status: review
 blocked: false
 priority: must

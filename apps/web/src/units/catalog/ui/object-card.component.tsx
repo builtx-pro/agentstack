@@ -69,7 +69,6 @@ export function ObjectCard({
         </Group>
         <Button
           variant="subtle"
-          size="compact-xs"
           rightSection={<IconArrowUpRight size={14} />}
           onClick={onOpen}
         >

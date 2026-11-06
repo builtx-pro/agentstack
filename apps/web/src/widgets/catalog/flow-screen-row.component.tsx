@@ -53,7 +53,7 @@ export function FlowScreenRow({
               total: screens.length,
             })}
           </Text>
-          <Button size="xs" variant="light" onClick={window.showMore}>
+          <Button variant="light" onClick={window.showMore}>
             {t("Show next 12")}
           </Button>
         </Group>

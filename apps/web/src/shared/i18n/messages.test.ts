@@ -1,3 +1,6 @@
+import {taskMessages} from './task-messages.constant';
+import {designMessages} from './design-messages.constant';
+import {planningMessages} from './planning-messages.constant';
 import {describe,expect,it,afterEach} from 'vitest';
 import {accountMessages} from './account-messages.constant';
 import {appMessages} from './app-messages.constant';
@@ -7,7 +10,7 @@ import {kindLabels,statusLabels,sectionInfo} from '@shared/lib/labels.constant';
 import {navigation} from '@widgets/shell/navigation.constant';
 import {setLocale,translate} from './locale-store';
 import {errorMessage} from './error-message.util';
-const messages={...appMessages,...settingsMessages,...catalogMessages,...accountMessages};
+const messages={...taskMessages,...designMessages,...planningMessages,...appMessages,...settingsMessages,...catalogMessages,...accountMessages};
 afterEach(()=>setLocale('en'));
 describe('translation contracts',()=>{
  it('covers every navigation, section, kind and status label',()=>{

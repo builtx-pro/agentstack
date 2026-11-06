@@ -36,6 +36,7 @@ const objects = [
   item("old", "story", { epicId: "epic" }, "done", true),
 ];
 describe("planning hierarchy", () => {
+  it("orders milestone names naturally instead of by database UUID",()=>{expect(planningRoots([item("M10","wave"),item("M2","wave"),item("M1","wave")]).map(o=>o.title)).toEqual(["M1","M2","M10"]);});
   it("places linked work under parents without duplicating roots", () => {
     expect(planningRoots(objects).map((o) => o.id)).toEqual([
       "wave",

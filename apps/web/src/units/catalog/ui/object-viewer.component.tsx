@@ -90,7 +90,6 @@ export function ObjectViewer({
           <Group gap="xs">
             {canEdit && (
               <Button
-                size="xs"
                 variant="light"
                 leftSection={<IconEdit size={15} />}
                 onClick={onEdit}
@@ -101,7 +100,6 @@ export function ObjectViewer({
             <Menu position="bottom-end">
               <Menu.Target>
                 <Button
-                  size="xs"
                   variant="default"
                   aria-label={t("More object actions")}
                 >

@@ -2,6 +2,7 @@
 id: STORY-005-02
 epic: EPIC-005
 title: Replace an asset safely
+sprint: SPRINT-002
 status: review
 blocked: false
 priority: must

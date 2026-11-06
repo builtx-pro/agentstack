@@ -99,7 +99,6 @@ export function Repositories({
           <Title order={3}>{t("Repositories")}</Title>
           <Button
             variant="subtle"
-            size="xs"
             loading={query.isFetching}
             onClick={() => void query.refetch()}
           >{t("Reload connections")}</Button>
@@ -191,7 +190,6 @@ export function Repositories({
           {repositoryError(query.error)}
           <Button
             variant="subtle"
-            size="xs"
             onClick={() => void query.refetch()}
           >{t("Reload connections")}</Button>
         </Alert>
@@ -230,7 +228,6 @@ node packages/cli/dist/main.js --project ${projectId} --timeout-ms 120000 reposi
 node packages/cli/dist/main.js --project ${projectId} repositories refresh CONNECTION_ID`}</Code>
           <Button
             variant="light"
-            size="xs"
             onClick={() =>
               clipboard.copy(
                 `node packages/cli/dist/main.js --project ${projectId} --timeout-ms 120000 repositories sync CONNECTION_ID --repo /path/to/checkout --stage`,

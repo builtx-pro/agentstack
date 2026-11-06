@@ -45,3 +45,8 @@ Planning documents describe the intended contract. Story records and release ver
 - [0.3.0 workspace verification](releases/0.3.0-verification.md)
 
 - [0.3.1 theme and contrast verification](releases/0.3.1-verification.md)
+
+- [Workspace organization and task boards](product/workspace-v04.md)
+- [Current delivery scope](product/sprints/workspace-v04.md)
+
+- [0.4.0 verification and migration notes](releases/0.4.0-verification.md)

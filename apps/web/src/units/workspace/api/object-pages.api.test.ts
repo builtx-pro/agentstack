@@ -38,3 +38,9 @@ describe("bounded document reads", () => {
     expect(options.signal).toBe(signal);
   });
 });
+it('omits empty optional filters so default documentation remains visible',async()=>{
+ const fetch=vi.fn().mockResolvedValue(new Response(JSON.stringify({items:[],nextCursor:null})));vi.stubGlobal('fetch',fetch);
+ await getDocumentPage('project',{kind:'document',q:'',tag:'',status:'',archived:false},null);
+ const query=new URL(fetch.mock.calls[0]![0],'http://localhost').searchParams;
+ expect(query.has('tag')).toBe(false);expect(query.has('status')).toBe(false);expect(query.has('q')).toBe(false);
+});

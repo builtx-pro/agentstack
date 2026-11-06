@@ -20,11 +20,12 @@ Saving a comment does not launch an LLM or spend provider credits. AgentStack co
 
 | Area | Workflow |
 | --- | --- |
-| Screens | Ordered user flows, alternative states, search, tags, variants, themes and shareable links |
+| Screens | Ordered flows, desktop/mobile frames, alternative states, search, tags, themes and shareable links |
 | Assets | Images and illustrations, protected files, used-by references, discussions and visual history |
 | Feedback | Revision-bound notes, expiring claims, evidence, human acceptance and reopening |
-| Knowledge | Markdown documents, agent rules, editable checklists, history and restoration |
-| Planning | Waves, epics, sprints, stories, features and proposals converted into work |
+| Knowledge | Rendered/source Markdown, paginated documents and rules, checklists, history and restoration |
+| Planning | Expandable waves/epics/sprints, progress, story kanban and agent review board |
+| My tasks | Owner-private tasks plus accessible assigned project work, versioned edits and history |
 | Progress | Counts from actual stories, group progress, historical scope and activity |
 | Account | Profile and avatar, RU/EN, personal accent, light/dark/system theme, password, sessions and optional authenticator MFA |
 | Onboarding | First-login introduction, 11 practical chapters and a checklist based on real project materials |

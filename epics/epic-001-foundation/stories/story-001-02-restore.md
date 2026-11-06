@@ -2,6 +2,7 @@
 id: STORY-001-02
 epic: EPIC-001
 title: Back up and restore an instance
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

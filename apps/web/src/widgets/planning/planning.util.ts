@@ -1,4 +1,6 @@
 import type { ProjectObject } from "@shared/api/schemas";
+const rank:Record<string,number>={wave:0,epic:1,sprint:2,story:3,feature:4,proposal:5};
+const ordered=(a:ProjectObject,b:ProjectObject)=>(rank[a.kind]??6)-(rank[b.kind]??6)||a.title.localeCompare(b.title,undefined,{numeric:true});
 export function planningChildren(
   object: ProjectObject,
   objects: ProjectObject[],
@@ -14,7 +16,7 @@ export function planningChildren(
           : object.kind === "sprint"
             ? child.kind === "story" && child.data.sprintId === object.id
             : false),
-  );
+  ).sort(ordered);
 }
 export function planningRoots(objects: ProjectObject[]) {
   const ids = new Set(objects.map((o) => o.id));
@@ -25,7 +27,7 @@ export function planningRoots(objects: ProjectObject[]) {
         ? !ids.has(String(object.data.epicId)) &&
           !ids.has(String(object.data.sprintId))
         : true,
-  );
+  ).sort(ordered);
 }
 export function planningSummary(
   object: ProjectObject,

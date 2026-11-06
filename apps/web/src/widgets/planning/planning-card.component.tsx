@@ -45,6 +45,8 @@ export function PlanningCard({
     progress?.groups.find((group) => group.id === object.id) ??
     planningSummary(object, objects);
   const checks = readChecklist(object.data);
+  const sourceKey = object.key.replace(/^repo:[^:]+:/, "");
+  const displayKey = /^(EPIC-|STORY-|SPRINT-|FEATURE-|wave:)/.test(sourceKey) ? sourceKey.replace(/:document$/, "") : "";
   const group = ["wave", "epic", "sprint"].includes(object.kind);
   return (
     <Accordion
@@ -61,11 +63,11 @@ export function PlanningCard({
             <span className={classes.label}>
               <span className={classes.meta}>
                 <span>
-                  {t(kindLabels[object.kind])} · {object.key}
+                  {t(kindLabels[object.kind])}{displayKey ? ` · ${displayKey}` : ""}
                 </span>
                 <StatusBadge status={object.status} />
                 {object.data.blocked === true && (
-                  <Badge color="red">{t("Blocked")}</Badge>
+                  <Badge component="span" color="red">{t("Blocked")}</Badge>
                 )}
               </span>
               <span className={classes.title}>{object.title}</span>
@@ -110,7 +112,7 @@ export function PlanningCard({
             onClick={() => onOpen(object.id)}
             rightSection={<IconArrowUpRight size={16} />}
           >
-            {t("Open")}
+            {t("Open details")}
           </Button>
         </div>
         {group && summary.total > 0 && (

@@ -91,7 +91,7 @@ export function ObjectPreview({
           )}
           {!compact && preview && (
             <Group>
-              <Button size="xs" variant="light" onClick={() => setLive(!live)}>
+              <Button variant="light" onClick={() => setLive(!live)}>
                 {live ? t("Show screenshot") : t("Open isolated live preview")}
               </Button>
               <Anchor

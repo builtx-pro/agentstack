@@ -101,7 +101,6 @@ export function SnapshotPreview({
           <Alert color="red">
             {repositoryError(query.error)}
             <Button
-              size="xs"
               variant="subtle"
               onClick={() => void query.refetch()}
             >{t("Reload preview")}</Button>
@@ -132,7 +131,6 @@ export function SnapshotPreview({
                 <Alert color="red">
                   {repositoryError(actions.apply.error)}
                   <Button
-                    size="xs"
                     variant="subtle"
                     onClick={() => void reloadPreview()}
                   >{t("Reload preview")}</Button>
@@ -142,7 +140,6 @@ export function SnapshotPreview({
                 <Group gap="xs">
                   <Text size="sm">{t('Selected: {count}',{count:selected.length})}</Text>
                   <Button
-                    size="xs"
                     variant="light"
                     disabled={!eligibleEntries.length}
                     onClick={() =>
@@ -151,7 +148,6 @@ export function SnapshotPreview({
                   >{t('Select all eligible ({count})',{count:eligibleEntries.length})}
                   </Button>
                   <Button
-                    size="xs"
                     variant="subtle"
                     disabled={!selected.length}
                     onClick={() => setSelected([])}
@@ -242,7 +238,6 @@ export function SnapshotPreview({
                       classNames={{ label: classes.compareButtonLabel }}
                       aria-label={`${expanded === entry.key ? t("Hide comparison") : t("Compare changes")}: ${entry.title}`}
                       variant="subtle"
-                      size="compact-xs"
                       mt="sm"
                       onClick={() =>
                         setExpanded(expanded === entry.key ? "" : entry.key)
@@ -375,7 +370,6 @@ export function SnapshotPreview({
             <Alert color="red">
               {repositoryError(actions.apply.error)}
               <Button
-                size="xs"
                 variant="subtle"
                 onClick={() => void reloadPreview()}
               >{t("Reload preview")}</Button>

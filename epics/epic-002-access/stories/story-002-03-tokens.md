@@ -2,6 +2,7 @@
 id: STORY-002-03
 epic: EPIC-002
 title: Issue scoped agent access
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

@@ -2,6 +2,7 @@
 id: STORY-008-02
 epic: EPIC-008
 title: Triage product proposals
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

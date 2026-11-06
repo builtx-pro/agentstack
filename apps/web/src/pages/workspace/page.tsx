@@ -1,3 +1,4 @@
+import {ProjectTasks} from "@units/tasks/ui/project-tasks.component";
 import { useI18n } from "@shared/i18n";
 import { Navigate, useParams } from "@tanstack/react-router";
 import { Stack, Group, Title, Text, Button, Menu, Alert } from "@mantine/core";
@@ -159,6 +160,7 @@ function ProjectWorkspace() {
                 pagination={vm.documentPagination}
               />
             )}
+            {vm.section === "tasks" && <ProjectTasks projectId={vm.projectId} projectName={vm.project.data.name} objects={vm.objects.data} notes={vm.notes.data??[]} canEdit={vm.canEdit} onOpen={vm.select} onCreate={()=>vm.setEditor({kind:"story"})}/>}
             {vm.section === "plan" && (
               <Planning
                 projectId={vm.projectId}
@@ -210,7 +212,7 @@ function ProjectWorkspace() {
           !vm.selectedError && (
             <Alert color="orange" title={t("This item is unavailable")}>
               {t("It may have been archived or you may not have access.")}{" "}
-              <Button size="xs" variant="subtle" onClick={() => vm.select("")}>
+              <Button variant="subtle" onClick={() => vm.select("")}>
                 {t("Dismiss")}
               </Button>
             </Alert>
