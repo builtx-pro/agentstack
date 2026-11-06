@@ -2,6 +2,7 @@
 id: STORY-003-01
 epic: EPIC-003
 title: Compare object revisions
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

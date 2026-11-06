@@ -2,6 +2,7 @@
 id: STORY-014-03
 epic: EPIC-014
 title: Navigate a cohesive illustrated workspace
+sprint: SPRINT-006
 status: done
 blocked: false
 priority: must

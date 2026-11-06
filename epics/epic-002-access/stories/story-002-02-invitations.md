@@ -2,6 +2,7 @@
 id: STORY-002-02
 epic: EPIC-002
 title: Invite a collaborator
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

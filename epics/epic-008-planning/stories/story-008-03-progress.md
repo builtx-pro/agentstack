@@ -2,6 +2,7 @@
 id: STORY-008-03
 epic: EPIC-008
 title: Read honest progress
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

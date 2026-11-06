@@ -1,12 +1,13 @@
 import { Pool } from "pg";
 import { readFile } from "node:fs/promises";
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
 const migrations = [
   { version: 1, file: "001-initial.sql" },
   { version: 2, file: "002-user-audit.sql" },
   { version: 3, file: "003-claim-rule-snapshots.sql" },
   { version: 4, file: "004-repository-connections.sql" },
   { version: 5, file: "005-accounts.sql" },
+  { version: 6, file: "006-personal-tasks.sql" },
 ] as const;
 export async function migrate(ownerUrl: string, applicationPassword: string) {
   if (applicationPassword.length < 24)
@@ -61,7 +62,7 @@ export async function migrate(ownerUrl: string, applicationPassword: string) {
       "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO agentstack_app",
     );
     await client.query(
-      "REVOKE UPDATE,DELETE ON object_revisions,note_revisions,project_revisions,audit_events,installation_admin_audit,repository_snapshots,account_history FROM agentstack_app",
+      "REVOKE UPDATE,DELETE ON object_revisions,note_revisions,project_revisions,audit_events,installation_admin_audit,repository_snapshots,account_history,personal_task_history FROM agentstack_app",
     );
     await client.query(
       "REVOKE INSERT,UPDATE,DELETE ON schema_migrations,legacy_links FROM agentstack_app",

@@ -2,6 +2,7 @@
 id: STORY-006-03
 epic: EPIC-006
 title: Accept or reopen a result
+sprint: SPRINT-002
 status: review
 blocked: false
 priority: must

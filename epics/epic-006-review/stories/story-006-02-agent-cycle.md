@@ -2,6 +2,7 @@
 id: STORY-006-02
 epic: EPIC-006
 title: Claim and submit agent work
+sprint: SPRINT-002
 status: review
 blocked: false
 priority: must

@@ -1,0 +1,9 @@
+import {test,expect} from '@playwright/test';
+import {setupReviewApi} from './fixtures/review-api.fixture';
+for(const scheme of ['light','dark'] as const)for(const accent of ['#d9480f','#000000','#ffffff'])test(`project card ${scheme} ${accent} has readable action and integrated artwork`,async({page},info)=>{
+ await setupReviewApi(page);await page.route('**/api/v1/account',route=>route.fulfill({json:{user:{id:'user-one',name:'Demo reviewer',email:'reviewer@example.test',isAdmin:true},version:1,preferences:{locale:'en',theme:scheme,accent,onboardingCompleted:true},avatarUrl:null,mfaEnabled:false,recoveryCodesRemaining:0}}));await page.goto('/');
+ const card=page.getByRole('article').first(),button=card.getByRole('link',{name:'Open project'});await expect(button).toBeVisible();await expect(page.locator('html')).toHaveAttribute('data-mantine-color-scheme',scheme);
+ const ratios=await button.evaluate(el=>{const lum=(s:string)=>s.match(/[\d.]+/g)!.slice(0,3).map(Number).map(v=>{const n=v/255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4}).reduce((sum,n,i)=>sum+n*[.2126,.7152,.0722][i]!,0);const ratio=(a:string,b:string)=>{const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};const css=getComputedStyle(el);return{text:ratio(css.color,css.backgroundColor),boundary:ratio(css.backgroundColor,getComputedStyle(el.closest('article')!).backgroundColor),height:el.getBoundingClientRect().height}});
+ expect(ratios.text).toBeGreaterThanOrEqual(4.5);expect(ratios.boundary).toBeGreaterThanOrEqual(3);expect(ratios.height).toBe(42);expect(await card.locator('img').evaluate(el=>el.getBoundingClientRect().width)).toBeGreaterThanOrEqual(200);await page.screenshot({path:info.outputPath(`projects-${scheme}-${accent.slice(1)}.png`),animations:'disabled'});
+ await page.setViewportSize({width:390,height:844});await expect(button).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

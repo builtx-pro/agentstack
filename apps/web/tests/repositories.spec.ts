@@ -505,10 +505,11 @@ test("pipeline polling is scoped to the visible plan and does not reload the cat
   await expect(
     page.getByRole("heading", { name: "Project knowledge" }),
   ).toBeVisible();
+  await expect.poll(() => state.objectReads).toBe(2); // One bounded document page after navigation.
   const stopped = state.pipelineReads;
   await page.clock.fastForward(61000);
   expect(state.pipelineReads).toBe(stopped);
-  expect(state.objectReads).toBe(1);
+  expect(state.objectReads).toBe(2);
 });
 
 test("stale apply is not retried and refresh requires a new selection", async ({

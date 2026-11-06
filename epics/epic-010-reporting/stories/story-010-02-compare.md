@@ -2,6 +2,7 @@
 id: STORY-010-02
 epic: EPIC-010
 title: Compare screen and asset versions
+sprint: SPRINT-004
 status: review
 blocked: false
 priority: must

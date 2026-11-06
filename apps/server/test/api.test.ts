@@ -1817,7 +1817,7 @@ it("upgrades v2 claims with explicitly unknown rules and preserves original hist
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT status,version,claimed_rule_revisions FROM notes WHERE id=$1",[noteId])).rows[0]).toEqual({status:"in_progress",version:2,claimed_rule_revisions:null});
     expect((await old.query("SELECT snapshot FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].snapshot).toEqual(historical);
-    expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(5);
+    expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(6);
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT count(*)::int AS count FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].count).toBe(1);
   }finally{await old?.end();if(created)await owner.query(`DROP DATABASE ${databaseName}`);await owner.end();}

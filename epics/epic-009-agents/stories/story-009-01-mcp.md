@@ -2,6 +2,7 @@
 id: STORY-009-01
 epic: EPIC-009
 title: Connect a stdio MCP client
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

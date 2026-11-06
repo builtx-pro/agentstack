@@ -2,6 +2,7 @@
 id: STORY-014-04
 epic: EPIC-014
 title: Install and learn the workspace
+sprint: SPRINT-006
 status: review
 blocked: false
 priority: must

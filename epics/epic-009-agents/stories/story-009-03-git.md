@@ -2,6 +2,7 @@
 id: STORY-009-03
 epic: EPIC-009
 title: Exchange manifests with Git
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

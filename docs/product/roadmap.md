@@ -10,6 +10,7 @@ No calendar estimates. A sprint is an ordered implementation batch, not a promis
 | M4 | S04 | Dashboards, migration and public release | 010–012 |
 | M5 | S05 | Repository connections, reviewed plan/docs sync and pipeline visibility | 013 |
 | M6 | S06 | Ordered catalogs, personal accounts, illustrated UI and guided installation | 014 |
+| M7 | S07 | Organized settings, readable planning, task boards and self-review catalog | 015 |
 
 All requested capabilities remain in scope. Optional later extensions: SSO, customer subdomain aliases, CI attestation providers, remote OAuth MCP. These must not block the stdio MCP or authenticated customer workflow.
 

@@ -2,6 +2,7 @@
 id: STORY-012-02
 epic: EPIC-012
 title: Pass release verification
+sprint: SPRINT-004
 status: review
 blocked: false
 priority: must

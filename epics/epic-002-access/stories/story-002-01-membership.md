@@ -2,6 +2,7 @@
 id: STORY-002-01
 epic: EPIC-002
 title: Assign project roles
+sprint: SPRINT-001
 status: review
 blocked: false
 priority: must

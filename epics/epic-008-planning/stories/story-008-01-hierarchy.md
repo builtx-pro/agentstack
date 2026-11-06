@@ -2,6 +2,7 @@
 id: STORY-008-01
 epic: EPIC-008
 title: Maintain delivery structure
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must

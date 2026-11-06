@@ -15,6 +15,7 @@ import { Route as GuideRouteImport } from './routes/guide'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as LegacyRouteImport } from './routes/legacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ProjectsProjectIdSectionRouteImport } from './routes/projects.$projectId.$section'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsProjectIdSectionRoute =
   ProjectsProjectIdSectionRouteImport.update({
     id: '/projects/$projectId/$section',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
+  '/tasks': typeof TasksRoute
   '/projects/$projectId/$section': typeof ProjectsProjectIdSectionRoute
 }
 export interface FileRoutesByTo {
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
+  '/tasks': typeof TasksRoute
   '/projects/$projectId/$section': typeof ProjectsProjectIdSectionRoute
 }
 export interface FileRoutesById {
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/invite': typeof InviteRoute
   '/legacy': typeof LegacyRoute
   '/login': typeof LoginRoute
+  '/tasks': typeof TasksRoute
   '/projects/$projectId/$section': typeof ProjectsProjectIdSectionRoute
 }
 export interface FileRouteTypes {
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/legacy'
     | '/login'
+    | '/tasks'
     | '/projects/$projectId/$section'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/legacy'
     | '/login'
+    | '/tasks'
     | '/projects/$projectId/$section'
   id:
     | '__root__'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/invite'
     | '/legacy'
     | '/login'
+    | '/tasks'
     | '/projects/$projectId/$section'
   fileRoutesById: FileRoutesById
 }
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   InviteRoute: typeof InviteRoute
   LegacyRoute: typeof LegacyRoute
   LoginRoute: typeof LoginRoute
+  TasksRoute: typeof TasksRoute
   ProjectsProjectIdSectionRoute: typeof ProjectsProjectIdSectionRoute
 }
 
@@ -166,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects/$projectId/$section': {
       id: '/projects/$projectId/$section'
       path: '/projects/$projectId/$section'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteRoute: InviteRoute,
   LegacyRoute: LegacyRoute,
   LoginRoute: LoginRoute,
+  TasksRoute: TasksRoute,
   ProjectsProjectIdSectionRoute: ProjectsProjectIdSectionRoute,
 }
 export const routeTree = rootRouteImport

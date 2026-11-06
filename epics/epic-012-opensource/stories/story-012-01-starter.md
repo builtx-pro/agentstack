@@ -2,6 +2,7 @@
 id: STORY-012-01
 epic: EPIC-012
 title: Use a synthetic starter project
+sprint: SPRINT-004
 status: review
 blocked: false
 priority: must

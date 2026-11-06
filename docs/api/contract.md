@@ -64,6 +64,10 @@ Result `{summary,revision?,previewUrl?,checks:[{name,result:'passed'|'failed'|'n
 - `GET .../notes/:id/history` revision/event list.
 Claim atomic and expires; only claimant or authorized human may submit/release active lease. Submit requires summary + checks, status→ready_for_review. Resolve human only with reason, status must be ready_for_review. Reopen human with reason. No bypass through object status CRUD.
 
+## Personal tasks and kanban
+
+See [personal and project task boards](tasks.md) for human-session task CRUD/history, the mixed assigned-story board, and the project-scoped MCP kanban workflow.
+
 ## Reporting/context/audit
 - `GET /projects/:projectId/progress` → `{total,done,percent,byStatus,groups:[{id,title,kind,total,done,percent}],notes:{open,in_progress,ready_for_review,resolved},timeline:[{date,total,done}]}`. Unique visible active stories only. No empty=100%, no fake historical data.
 - `GET /projects/:projectId/activity` paginated safe event summaries for visible objects. Do not leak member/token metadata to customers.

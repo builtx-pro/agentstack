@@ -2,6 +2,7 @@
 id: STORY-013-02
 epic: EPIC-013
 title: Reviewed synchronization
+sprint: SPRINT-005
 status: review
 blocked: false
 priority: must

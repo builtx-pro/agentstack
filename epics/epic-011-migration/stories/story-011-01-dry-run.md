@@ -2,6 +2,7 @@
 id: STORY-011-01
 epic: EPIC-011
 title: Validate legacy import
+sprint: SPRINT-004
 status: review
 blocked: false
 priority: must

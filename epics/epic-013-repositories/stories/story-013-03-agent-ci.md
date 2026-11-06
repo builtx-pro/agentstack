@@ -2,6 +2,7 @@
 id: STORY-013-03
 epic: EPIC-013
 title: Agent and CI integration
+sprint: SPRINT-005
 status: review
 blocked: false
 priority: must

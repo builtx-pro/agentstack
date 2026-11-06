@@ -2,6 +2,7 @@
 id: STORY-004-02
 epic: EPIC-004
 title: Open an exact screen revision
+sprint: SPRINT-002
 status: review
 blocked: false
 priority: must

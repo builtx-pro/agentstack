@@ -1,8 +1,11 @@
+import {planningMessages} from './planning-messages.constant';
+import {taskMessages} from './task-messages.constant';
+import {designMessages} from './design-messages.constant';
 import {accountMessages} from './account-messages.constant';
 import {appMessages} from './app-messages.constant';
 import {settingsMessages} from './settings-messages.constant';
 import {catalogMessages} from './catalog-messages.constant';
-const messages:Record<string,string>={...appMessages,...settingsMessages,...catalogMessages,...accountMessages};
+const messages:Record<string,string>={...appMessages,...settingsMessages,...catalogMessages,...accountMessages,...planningMessages,...taskMessages,...designMessages};
 export type Locale = 'en' | 'ru';
 export type MessageValues = Readonly<Record<string,string|number>>;
 export const LOCALE_STORAGE_KEY='agentstack.locale';

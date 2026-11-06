@@ -28,6 +28,22 @@ async function connect(fetch: typeof globalThis.fetch) {
   return client;
 }
 describe("MCP protocol adapter", () => {
+  it("lists project kanban tasks through the scoped object API without personal task tools", async () => {
+    const fetch = vi.fn(async (url: unknown) => {
+      expect(String(url)).toContain(`/projects/${projectId}/objects?`);
+      const parsed = new URL(String(url));
+      expect(parsed.searchParams.get('kind')).toBe('story');
+      expect(parsed.searchParams.get('status')).toBe('in_progress');
+      return Response.json({items: [], nextCursor: null});
+    });
+    const client = await connect(fetch);
+    const tools = (await client.listTools()).tools;
+    expect(tools.map(tool => tool.name).join(' ')).not.toContain('personal');
+    const result = await client.callTool({name: 'list_project_tasks', arguments: {projectId, status:'in_progress'}});
+    expect(result.isError).not.toBe(true);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("lists real tools and never offers human acceptance or shell execution", async () => {
     const client = await connect(async () => Response.json({}));
     const tools = (await client.listTools()).tools;

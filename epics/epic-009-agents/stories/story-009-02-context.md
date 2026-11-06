@@ -2,6 +2,7 @@
 id: STORY-009-02
 epic: EPIC-009
 title: Export portable agent context
+sprint: SPRINT-003
 status: review
 blocked: false
 priority: must
