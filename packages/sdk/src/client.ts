@@ -4,6 +4,7 @@ import { AgentStackError } from "./errors.errors.js";
 import { retryRateLimitedUpload } from "./upload-retry.util.js";
 import * as S from "./schemas.schema.js";
 import * as R from "./repository.schema.js";
+import * as T from "./task.schema.js";
 import type {
   ClientOptions,
   RequestOptions,
@@ -28,6 +29,24 @@ export class AgentStackClient {
   readonly transport: ApiTransport;
   constructor(options: ClientOptions) {
     this.transport = new ApiTransport(options);
+  }
+  /** Human session only. Project-scoped tokens cannot read a personal board. */
+  tasks(filters: Partial<T.TaskListQuery> = {}, options?: RequestOptions) {
+    T.taskListQuerySchema.parse(filters);
+    return this.transport.request("GET", `/tasks${query(filters)}`, S.pageSchema(T.taskItemSchema), undefined, options);
+  }
+  personalTask(id: string, options?: RequestOptions) {
+    return this.transport.request("GET", `/tasks/${S.idSchema.parse(id)}`, T.taskItemSchema, undefined, options);
+  }
+  createPersonalTask(draft: z.input<typeof T.personalTaskDraftSchema>, options?: RequestOptions) {
+    return this.transport.request("POST", "/tasks", T.taskItemSchema, T.personalTaskDraftSchema.parse(draft), options);
+  }
+  updatePersonalTask(id: string, patch: T.PersonalTaskPatch, options?: RequestOptions) {
+    return this.transport.request("PATCH", `/tasks/${S.idSchema.parse(id)}`, T.taskItemSchema, T.personalTaskPatchSchema.parse(patch), options);
+  }
+  personalTaskHistory(id: string, filters: PageOptions = {}, options?: RequestOptions) {
+    T.taskHistoryQuerySchema.parse(filters);
+    return this.transport.request("GET", `/tasks/${S.idSchema.parse(id)}/history${query(filters)}`, S.pageSchema(T.taskHistoryEntrySchema), undefined, options);
   }
   capabilities(options?: RequestOptions) {
     return this.transport.request(

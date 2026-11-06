@@ -1,3 +1,4 @@
+import {registerTaskRoutes} from './tasks/tasks.routes.js';
 import {registerAccountRoutes,setSession} from './account/account.routes.js';
 import {beginLogin} from './account/account.service.js';
 import { registerRepositoryRoutes } from "./repositories/repository.routes.js";
@@ -257,6 +258,7 @@ export async function buildApp(config: ServerConfig) {
     },
   );
   registerAccountRoutes(app,database,config.repositoryEncryptionKey,config.secureCookies);
+  registerTaskRoutes(app,database);
   app.post(prefix + "/auth/logout", async (r, reply) => {
     if (principal(r).type !== "human") throw forbidden();
     await database.pool.query("DELETE FROM sessions WHERE hash=$1", [

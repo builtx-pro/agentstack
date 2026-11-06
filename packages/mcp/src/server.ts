@@ -105,6 +105,15 @@ export function createMcpServer(api: AgentStackClient): McpServer {
       ),
   );
   server.registerTool(
+    "list_project_tasks",
+    {
+      description: "Read the project story kanban using actual work-item status. Follow nextCursor. Agent review tasks are listed separately with list_review_items and move through claim_review_item/submit_review_result; only a human accepts results. This tool never reads personal tasks.",
+      inputSchema: {...projectInput, ...pagination, status: z.enum(['backlog','ready','in_progress','review','done']).optional(), q:z.string().max(200).optional()},
+      annotations: readAnnotations,
+    },
+    async ({projectId,...filters},extra) => toolResult(() => api.objects(projectId,{...filters,kind:'story'},{signal:extra.signal})),
+  );
+  server.registerTool(
     "get_object",
     {
       description:

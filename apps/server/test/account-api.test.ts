@@ -91,7 +91,7 @@ describe("personal account API", () => {
     expect(initial.preferences).toEqual({
       locale: null,
       theme: "auto",
-      accent: "#7950f2",
+      accent: "#d9480f",
       onboardingCompleted: false,
     });
     const update = await req(
