@@ -9,12 +9,12 @@
 @media(max-width:48em){.stat{padding:16px;min-height:185px;border-radius:17px}.statArtwork{width:90px;height:90px}.statLabel{font-size:13px}.hero{border-radius:20px}}
 @media(prefers-reduced-motion:reduce){.stat{transition:none}.stat:hover{transform:none}}
 .chart { width:100%;height:180px;overflow:visible; }
-.line { fill:none;stroke:var(--mantine-color-violet-5);stroke-width:3;stroke-linecap:round;stroke-linejoin:round; }
-.scopeLine { fill:none;stroke:var(--mantine-color-gray-5);stroke-width:2;stroke-dasharray:5 6; }
+.line { fill:none;stroke:var(--app-accent-text);stroke-width:3;stroke-linecap:round;stroke-linejoin:round; }
+.scopeLine { fill:none;stroke:var(--app-text-muted);stroke-width:2;stroke-dasharray:5 6; }
 .gridLine { stroke:var(--app-border);stroke-width:1; }
 
-.doneMarker { fill: var(--mantine-color-violet-5); stroke: var(--app-panel); stroke-width:2; }
-.scopeMarker { fill:var(--mantine-color-gray-4); stroke:var(--app-panel); stroke-width:2; }
+.doneMarker { fill: var(--app-accent-text); stroke: var(--app-panel); stroke-width:2; }
+.scopeMarker { fill:var(--app-text-muted); stroke:var(--app-panel); stroke-width:2; }
 
 .mobileProgress {display:none;margin-top:24px;}
 @media(max-width:48em){.heroProgress{display:none}.mobileProgress{display:block}}

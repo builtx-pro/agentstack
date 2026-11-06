@@ -24,3 +24,5 @@ Given an unauthorized actor or stale version, the operation fails without disclo
 [Detailed contract](../../../docs/product/workspace-experience.md)
 
 [Release verification](../../../docs/releases/0.3.0-verification.md).
+
+Theme follow-up: corrected compiled root tokens and public theme selection; added production-bundle contrast checks. See [0.3.1 verification](../../../docs/releases/0.3.1-verification.md).
