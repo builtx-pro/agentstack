@@ -1,6 +1,6 @@
 {
   "name": "@agentstack/web",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "build": "vite build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:themes:production": "playwright test --config playwright.production.config.ts"
   },
   "dependencies": {
     "@agentstack/ui": "file:../../packages/ui",

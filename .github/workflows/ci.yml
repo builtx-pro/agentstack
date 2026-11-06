@@ -28,6 +28,7 @@ jobs:
       - run: npm run test:setup
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e --workspace @agentstack/web
+      - run: npm run test:themes:production --workspace @agentstack/web
       - run: npm audit --omit=dev --audit-level=high
       - name: Exercise a private source checkout
         run: |

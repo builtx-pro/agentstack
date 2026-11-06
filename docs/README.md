@@ -43,3 +43,5 @@ Planning documents describe the intended contract. Story records and release ver
 - [0.2.0 repository integration verification](releases/0.2.0-verification.md)
 
 - [0.3.0 workspace verification](releases/0.3.0-verification.md)
+
+- [0.3.1 theme and contrast verification](releases/0.3.1-verification.md)
