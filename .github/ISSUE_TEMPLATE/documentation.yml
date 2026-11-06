@@ -1,0 +1,21 @@
+name: Documentation improvement
+description: Report a missing, confusing or outdated instruction.
+labels: [documentation]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or file
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What were you trying to do, and what was unclear?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested correction
+      description: Optional. Remove private URLs, credentials and customer information.

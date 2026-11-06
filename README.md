@@ -1,10 +1,12 @@
 # AgentStack
 
+[![CI](https://github.com/builtx-pro/agentstack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/builtx-pro/agentstack/actions/workflows/ci.yml)
+
 **Review what your coding agent builds. Give it precise feedback. Keep the whole project in view.**
 
 AgentStack is a self-hosted workspace for developers, designers, customers and coding agents. Arrange screens into flows, discuss a specific revision, review assets, edit project knowledge and track delivery in one place.
 
-[Русский](README.ru.md) · [Install](docs/runbooks/installation.md) · [Agent setup](docs/agents/README.md) · [Documentation](docs/README.md)
+[Contribute](CONTRIBUTING.md) · [Discussions](https://github.com/builtx-pro/agentstack/discussions) · [Releases](https://github.com/builtx-pro/agentstack/releases) · [Русский](README.ru.md) · [Install](docs/runbooks/installation.md) · [Agent setup](docs/agents/README.md) · [Documentation](docs/README.md)
 
 ## The working loop
 

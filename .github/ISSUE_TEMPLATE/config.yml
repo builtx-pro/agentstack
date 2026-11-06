@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and early ideas
+    url: https://github.com/builtx-pro/agentstack/discussions
+    about: Ask about installation, agent integrations or a possible contribution.
+  - name: Report a security vulnerability privately
+    url: https://github.com/builtx-pro/agentstack/security/advisories/new
+    about: Never include vulnerabilities, credentials or private customer data in public issues.
