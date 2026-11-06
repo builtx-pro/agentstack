@@ -1,0 +1,28 @@
+.content {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.content :global(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.content :global(pre) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.content :global(img) {
+  max-width: 100%;
+}
+.source {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: var(--mantine-font-size-sm);
+  line-height: 1.7;
+}
+.switch {
+  align-self: flex-start;
+  min-height: 42px;
+}
