@@ -1,5 +1,6 @@
 name: Feature proposal
 description: Explain the workflow you want to improve.
+labels: [enhancement]
 body:
   - type: textarea
     id: problem

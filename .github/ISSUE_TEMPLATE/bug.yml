@@ -1,5 +1,6 @@
 name: Bug report
 description: Report a reproducible problem using synthetic data.
+labels: [bug]
 body:
   - type: textarea
     id: problem
@@ -20,3 +21,13 @@ body:
       label: AgentStack version or commit
     validations:
       required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser, Docker version and installation method. Redact private hostnames.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Synthetic screenshots or relevant log lines. Never upload a database, token or customer material.

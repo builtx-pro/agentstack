@@ -1,6 +1,6 @@
 # Security policy
 
-AgentStack is currently under active development. No production release is declared supported until a tagged release includes its verification report.
+AgentStack is under active development. Security fixes target the latest released version on `main`; older releases do not have a separate backport guarantee. Check the [release notes](https://github.com/builtx-pro/agentstack/releases) and verification reports before upgrading. This policy does not imply an external security certification or a response-time SLA.
 
 Please report vulnerabilities through [GitHub private vulnerability reporting](https://github.com/builtx-pro/agentstack/security/advisories/new). Include a minimal synthetic reproduction and affected revision. Do not attach live credentials, private databases or customer material.
 

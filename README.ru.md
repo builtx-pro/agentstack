@@ -1,5 +1,9 @@
 # AgentStack
 
+[![CI](https://github.com/builtx-pro/agentstack/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/builtx-pro/agentstack/actions/workflows/ci.yml)
+
+[Как участвовать](CONTRIBUTING.md) · [Обсуждения](https://github.com/builtx-pro/agentstack/discussions) · [Релизы](https://github.com/builtx-pro/agentstack/releases)
+
 Рабочее место для разработчика и ИИ-агента: отсмотреть готовые экраны, оставить точную правку, проверить результат и видеть состояние проекта.
 
 [English](README.md) · [Установка](docs/runbooks/installation.md) · [Подключение агентов](docs/agents/README.md)
