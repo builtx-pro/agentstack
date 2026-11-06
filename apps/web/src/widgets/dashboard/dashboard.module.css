@@ -19,3 +19,7 @@
 
 .mobileProgress {display:none;margin-top:24px;}
 @media(max-width:48em){.heroProgress{display:none}.mobileProgress{display:block}}
+
+.heroCopy {min-width:0;max-width:100%;}
+.heroAction {max-width:100%;height:auto;min-height:42px;padding-block:10px;}
+.heroAction :global(.mantine-Button-label) {white-space:normal;overflow-wrap:anywhere;}

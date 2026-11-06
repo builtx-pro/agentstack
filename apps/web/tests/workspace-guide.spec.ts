@@ -27,3 +27,12 @@ test('first-run welcome persists dismissal and the guide stays available',async(
  await page.route('**/api/v1/account',async route=>{const request=route.request();if(request.method()==='PATCH'){const body=request.postDataJSON();expect(body.expectedVersion).toBe(1);expect(body.preferences).toEqual({onboardingCompleted:true});dismissed=true;patches++;}return route.fulfill({json:{user:{id:'user-one',name:'Demo reviewer',email:'reviewer@example.test',isAdmin:true},version:dismissed?2:1,preferences:{locale:'en',theme:'light',accent:'#7950f2',onboardingCompleted:dismissed},avatarUrl:null,mfaEnabled:false,recoveryCodesRemaining:0}});});
  await page.goto('/');await expect(page.getByRole('heading',{name:'Build your first workspace, step by step'})).toBeVisible();await page.getByRole('button',{name:'I know my way around'}).click();await expect(page.getByRole('heading',{name:'Build your first workspace, step by step'})).toHaveCount(0);expect(patches).toBe(1);await page.reload();await expect(page.getByRole('heading',{name:'Build your first workspace, step by step'})).toHaveCount(0);await page.getByRole('link',{name:'Getting started',exact:true}).click();await expect(page).toHaveURL(/\/guide$/);
 });
+
+test('mobile dashboard keeps enlarged Russian action text inside the card',async({page})=>{
+ await setupReviewApi(page,false,'ru');await page.setViewportSize({width:390,height:844});
+ await page.goto('/projects/project-one/overview');const action=page.getByRole('button',{name:'Проверьте последние изменения',exact:true});await expect(action).toBeVisible();
+ await page.addStyleTag({content:'section[aria-labelledby="project-pulse-title"] button { font-size: 20px; }'});
+ await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth)).toBe(390);
+ const button=await action.boundingBox();const card=await page.locator('section[aria-labelledby="project-pulse-title"]').boundingBox();expect(button!.x+button!.width).toBeLessThanOrEqual(card!.x+card!.width-20);
+ await action.click();await expect(page).toHaveURL(/\/reviews/);
+});
