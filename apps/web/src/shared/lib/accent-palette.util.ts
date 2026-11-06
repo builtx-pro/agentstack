@@ -1,6 +1,6 @@
 import type {MantineColorsTuple} from '@mantine/core';
-export const DEFAULT_ACCENT='#7950f2';
-export const ACCENT_PRESETS=[{name:'Violet',color:DEFAULT_ACCENT},{name:'Blue',color:'#228be6'},{name:'Teal',color:'#0c8599'},{name:'Green',color:'#2b8a3e'},{name:'Rose',color:'#d6336c'},{name:'Orange',color:'#d9480f'},{name:'Amber',color:'#b7791f'},{name:'Slate',color:'#495057'}] as const;
+export const DEFAULT_ACCENT='#d9480f';
+export const ACCENT_PRESETS=[{name:'Orange',color:DEFAULT_ACCENT},{name:'Blue',color:'#228be6'},{name:'Teal',color:'#0c8599'},{name:'Green',color:'#2b8a3e'},{name:'Rose',color:'#d6336c'},{name:'Violet',color:'#7950f2'},{name:'Amber',color:'#b7791f'},{name:'Slate',color:'#495057'}] as const;
 export const normalizeAccent=(value:unknown)=>typeof value==='string'&&/^#[a-f0-9]{6}$/i.test(value)?value.toLowerCase():DEFAULT_ACCENT;
 const rgb=(hex:string)=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const hex=(channels:number[])=>'#'+channels.map(c=>Math.max(0,Math.min(255,Math.round(c))).toString(16).padStart(2,'0')).join('');

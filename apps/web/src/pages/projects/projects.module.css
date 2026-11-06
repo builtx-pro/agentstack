@@ -1,0 +1,11 @@
+.card {position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;min-height:320px;padding:var(--mantine-spacing-xl);}
+.card::after {content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,var(--app-panel) 10%,color-mix(in srgb,var(--app-panel) 98%,transparent) 53%,transparent 90%);}
+.artwork {position:absolute;z-index:-1;right:-35px;top:90px;width:240px;height:240px;pointer-events:none;}
+.cardContent {position:relative;min-width:0;flex:1;}
+.role {border-color:var(--app-focus);background:var(--app-panel);color:var(--app-accent-text);max-width:100%;margin-bottom:var(--mantine-spacing-lg);}
+.title {max-width:90%;overflow-wrap:anywhere;}
+.description {max-width:60%;margin-top:var(--mantine-spacing-sm);line-height:1.55;}
+.open {background:var(--app-accent-text);color:var(--app-panel);border:1px solid var(--app-accent-text);align-self:stretch;margin-top:var(--mantine-spacing-xl);position:relative;}
+@media(max-width:48em){.card{min-height:300px;padding:var(--mantine-spacing-lg)}.artwork{right:-28px;top:90px;width:230px;height:230px}}
+
+.open:hover {background:var(--app-accent-text);filter:brightness(.94);}
