@@ -8,6 +8,7 @@ import {
   objectDraftSchema,
   objectKindSchema,
   objectPatchSchema,
+  screenImplementationSchema,
   resultInputSchema,
   versionSchema,
 } from "@agentstack/sdk";
@@ -282,6 +283,70 @@ export function createMcpServer(api: AgentStackClient): McpServer {
           signal: extra.signal,
           idempotencyKey: requestId,
         }),
+      ),
+  );
+  server.registerTool(
+    "update_screen_design",
+    {
+      description:
+        "Publish new preview material for one screen. Read the target before editing, upload the immutable image through the project file API if applicable, and supply its current object version.",
+      inputSchema: {
+        ...targetInput,
+        expectedVersion: versionSchema,
+        design: z
+          .object({
+            imageFileId: idSchema.optional(),
+            previewUrl: z.url({ protocol: /^https?$/ }).optional(),
+            previewMode: z.literal("tab").optional(),
+            designSourceRevision: z.string().trim().min(1).max(200).optional(),
+          })
+          .strict()
+          .refine(
+            (value) => Object.keys(value).length > 0,
+            "Supply a changed design field",
+          ),
+      },
+      annotations: writeAnnotations,
+    },
+    async ({ projectId, objectId, expectedVersion, design }, extra) =>
+      toolResult(async () => {
+        const options = { signal: extra.signal };
+        const screen = await api.object(projectId, objectId, options);
+        if (screen.kind !== "screen" || screen.version !== expectedVersion)
+          throw new Error(
+            "Read the current screen revision before updating its design.",
+          );
+        return api.updateObject(
+          projectId,
+          objectId,
+          { expectedVersion, data: { ...screen.data, ...design } },
+          options,
+        );
+      }),
+  );
+  server.registerTool(
+    "record_screen_implementation",
+    {
+      description:
+        "Record a platform build or an explicit design-only report against an exact screen designVersion. Inspect the running build first. This updates reported evidence, never human acceptance.",
+      inputSchema: {
+        ...targetInput,
+        expectedVersion: versionSchema,
+        screenImplementation: screenImplementationSchema,
+      },
+      annotations: writeAnnotations,
+    },
+    async (
+      { projectId, objectId, expectedVersion, screenImplementation },
+      extra,
+    ) =>
+      toolResult(() =>
+        api.updateObject(
+          projectId,
+          objectId,
+          { expectedVersion, screenImplementation },
+          { signal: extra.signal },
+        ),
       ),
   );
   server.registerTool(

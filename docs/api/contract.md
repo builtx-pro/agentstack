@@ -26,8 +26,10 @@ This contract coordinates the first implementation. All endpoints are under `/ap
 
 `ProjectObject = {id,projectId,key,kind,title,description,tags:string[],visibility:'team'|'customer',status:'backlog'|'ready'|'in_progress'|'review'|'done',archived:boolean,version:number,data:object,createdAt,updatedAt}`.
 
+Screen responses also expose the current design revision and platform-specific implementation reports. See [screen design revisions and application builds](screen-implementation.md).
+
 Each kind has a Zod data schema (no arbitrary server-side code):
-- screen: `{screenId?:string,variant?,palette?,frame?:'mobile'|'desktop',imageFileId?,previewUrl?,sourcePath?,assetIds?:string[]}`
+- screen: `{screenId?:string,variant?,palette?,frame?:'mobile'|'desktop',imageFileId?,previewUrl?,previewMode?:'tab',sourcePath?,designSourceRevision?,assetIds?:string[]}`
 - asset: `{fileId?,category?,source?,license?,variant?}`
 - flow: `{screenIds:string[],role?,phase?}`
 - document/rule: `{markdown:string}`

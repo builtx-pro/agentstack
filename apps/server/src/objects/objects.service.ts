@@ -1,3 +1,8 @@
+import {
+  nextScreenMetadata,
+  screenFields,
+  type ScreenMetadata,
+} from "./screen-implementation.service.js";
 import { randomUUID } from "node:crypto";
 import type { Context } from "../db/database.service.js";
 import { canEdit, human } from "../db/database.service.js";
@@ -33,6 +38,7 @@ export type ObjectRow = {
   archived: boolean;
   version: number;
   data: Record<string, unknown>;
+  screen_metadata?: ScreenMetadata | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -49,6 +55,7 @@ export const objectDto = (row: ObjectRow): ProjectObject => ({
   archived: row.archived,
   version: row.version,
   data: row.data,
+  ...(row.kind === "screen" ? screenFields(row) : {}),
   createdAt: new Date(row.created_at).toISOString(),
   updatedAt: new Date(row.updated_at).toISOString(),
 });
@@ -83,6 +90,10 @@ export async function readableReferences(
 ): Promise<ProjectObject> {
   if (!isCustomer(ctx)) return snapshot;
   const result = { ...snapshot, data: { ...snapshot.data } };
+  if (result.implementations)
+    result.implementations = result.implementations.filter(
+      (report) => report.visibility === "customer",
+    );
   const allRefs = Object.keys(referenceKinds).flatMap((k) =>
     Array.isArray(result.data[k])
       ? (result.data[k] as string[])
@@ -187,6 +198,11 @@ export async function appendObjectRevision(
   dryFiles?: Set<string>,
 ) {
   const snapshot = objectDto(row);
+  // Customer-visible history must remain safe even for readers predating build reports.
+  if (snapshot.visibility === "customer" && snapshot.implementations)
+    snapshot.implementations = snapshot.implementations.filter(
+      (report) => report.visibility === "customer",
+    );
   await ctx.db.query(
     "INSERT INTO object_revisions(id,project_id,object_id,version,actor_id,actor_name,source,summary,visibility,snapshot) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)",
     [
@@ -303,6 +319,15 @@ export async function patchObject(
       "Rules are internal project documents.",
     );
   if (old.kind === "rule") await lockProjectRules(ctx);
+  if (
+    patch.screenImplementation &&
+    (old.kind !== "screen" || Object.keys(patch).length !== 2)
+  )
+    throw new AppError(
+      422,
+      "invalid_screen_report",
+      "Record a build separately on a screen.",
+    );
   const data = patch.data
     ? await validateData(
         ctx,
@@ -312,6 +337,10 @@ export async function patchObject(
         options.dryFiles,
       )
     : old.data;
+  const screenMetadata =
+    old.kind === "screen"
+      ? await nextScreenMetadata(ctx, old, data, patch.screenImplementation)
+      : null;
   if (old.kind === "proposal" && data.linkedStoryId !== old.data.linkedStoryId)
     throw new AppError(
       422,
@@ -320,7 +349,7 @@ export async function patchObject(
     );
   const row = (
     await ctx.db.query(
-      "UPDATE objects SET title=$3,description=$4,tags=$5,visibility=$6,status=$7,archived=$8,data=$9,version=version+1,updated_at=now() WHERE id=$1 AND project_id=$2 RETURNING *",
+      "UPDATE objects SET title=$3,description=$4,tags=$5,visibility=$6,status=$7,archived=$8,data=$9,screen_metadata=$10,version=version+1,updated_at=now() WHERE id=$1 AND project_id=$2 RETURNING *",
       [
         id,
         ctx.projectId,
@@ -331,10 +360,18 @@ export async function patchObject(
         patch.status ?? old.status,
         patch.archived ?? old.archived,
         JSON.stringify(data),
+        screenMetadata ? JSON.stringify(screenMetadata) : null,
       ],
     )
   ).rows[0] as ObjectRow;
-  await appendObjectRevision(ctx, row, "Updated " + old.kind, options.dryFiles);
+  await appendObjectRevision(
+    ctx,
+    row,
+    patch.screenImplementation
+      ? "Recorded screen implementation"
+      : "Updated " + old.kind,
+    options.dryFiles,
+  );
   return readableReferences(ctx, objectDto(row));
 }
 export async function listObjects(

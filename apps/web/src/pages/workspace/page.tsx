@@ -223,6 +223,7 @@ function ProjectWorkspace() {
       </Stack>
       {vm.selected && !vm.editor && (
         <ObjectViewer
+          key={vm.selected.id}
           onTag={vm.filterTag}
           object={vm.selected}
           objects={vm.objects.data ?? []}

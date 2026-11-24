@@ -19,6 +19,7 @@
     "test": "vitest run src"
   },
   "dependencies": {
+    "@agentstack/contracts": "*",
     "zod": "^4.1.0"
   },
   "devDependencies": {

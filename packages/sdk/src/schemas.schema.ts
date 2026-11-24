@@ -1,3 +1,4 @@
+import { screenImplementationSchema, reportedImplementationSchema } from "@agentstack/contracts/screen-implementation";
 import { z } from "zod";
 
 export const idSchema = z.string().uuid();
@@ -42,6 +43,8 @@ export const projectSchema = z.object({
   updatedAt: z.string().optional(),
 });
 export const objectSchema = z.object({
+  designVersion: versionSchema.optional(),
+  implementations: z.array(reportedImplementationSchema).optional(),
   id: idSchema,
   projectId: idSchema,
   key: z.string(),
@@ -70,7 +73,7 @@ export const objectDraftSchema = z.object({
 export const objectPatchSchema = objectDraftSchema
   .omit({ key: true, kind: true })
   .partial()
-  .extend({ expectedVersion: versionSchema, archived: z.boolean().optional() });
+  .extend({ expectedVersion: versionSchema, archived: z.boolean().optional(), screenImplementation: screenImplementationSchema.optional() });
 export const resultInputSchema = z.object({
   summary: z.string().min(1).max(4000),
   revision: z.string().max(500).optional(),

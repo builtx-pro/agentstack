@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useI18n } from "@shared/i18n";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -13,6 +14,7 @@ import {
 } from "@mantine/core";
 import {
   IconEdit,
+  IconDeviceMobile,
   IconArchive,
   IconHistory,
   IconMessageCircle,
@@ -28,6 +30,8 @@ import { kindLabels } from "@shared/lib/labels.constant";
 import { ObjectPreview } from "./object-preview.component";
 import { Discussion } from "@units/review/ui/discussion.component";
 import { HistoryPanel } from "./history-panel.component";
+import { ScreenBuilds } from "./screen-builds.component";
+import { designVersion } from "../lib/screen-build.util";
 import classes from "./viewer.module.css";
 export function ObjectViewer({
   object,
@@ -47,6 +51,7 @@ export function ObjectViewer({
   onTag: (tag: string, object: ProjectObject) => void;
 }) {
   const { t } = useI18n();
+  const [visited, setVisited] = useState<string[]>(["review"]);
   const isMobile = useMediaQuery("(max-width: 48em)");
   const mutation = WorkspaceService.useWorkspaceMutation(object.projectId);
   const usage = objects.filter(
@@ -83,7 +88,10 @@ export function ObjectViewer({
               </Badge>
             ))}
             <Text size="xs" c="dimmed">
-              {object.key} · v{object.version}
+              {object.key} ·{" "}
+              {object.kind === "screen"
+                ? t("Design v{version}", { version: designVersion(object) })
+                : `v${object.version}`}
             </Text>
             {object.archived && <Badge color="orange">{t("Archived")}</Badge>}
           </Group>
@@ -99,10 +107,7 @@ export function ObjectViewer({
             )}
             <Menu position="bottom-end">
               <Menu.Target>
-                <Button
-                  variant="default"
-                  aria-label={t("More object actions")}
-                >
+                <Button variant="default" aria-label={t("More object actions")}>
                   <IconDots size={17} />
                 </Button>
               </Menu.Target>
@@ -160,7 +165,17 @@ Read current notes and project rules through AgentStack before editing. Submit e
             </Menu>
           </Group>
         </Group>
-        <Tabs defaultValue="review">
+        <Tabs
+          defaultValue="review"
+          keepMounted={false}
+          keepMountedMode="display-none"
+          onChange={(tab) => {
+            if (tab)
+              setVisited((previous) =>
+                previous.includes(tab) ? previous : [...previous, tab],
+              );
+          }}
+        >
           <Tabs.List mb="lg">
             <Tabs.Tab
               value="review"
@@ -168,11 +183,19 @@ Read current notes and project rules through AgentStack before editing. Submit e
             >
               {t("Review")}
             </Tabs.Tab>
+            {object.kind === "screen" && (
+              <Tabs.Tab
+                value="builds"
+                leftSection={<IconDeviceMobile size={16} />}
+              >
+                {t("Builds")}
+              </Tabs.Tab>
+            )}
             <Tabs.Tab value="history" leftSection={<IconHistory size={16} />}>
               {t("Versions & history")}
             </Tabs.Tab>
           </Tabs.List>
-          <Tabs.Panel value="review">
+          <Tabs.Panel value="review" keepMounted>
             <div className={classes.layout}>
               <div className={classes.visual}>
                 <ObjectPreview
@@ -246,7 +269,12 @@ Read current notes and project rules through AgentStack before editing. Submit e
               </aside>
             </div>
           </Tabs.Panel>
-          <Tabs.Panel value="history">
+          {object.kind === "screen" && (
+            <Tabs.Panel value="builds" keepMounted={visited.includes("builds")}>
+              <ScreenBuilds key={object.id} screen={object} canEdit={canEdit} />
+            </Tabs.Panel>
+          )}
+          <Tabs.Panel value="history" keepMounted={visited.includes("history")}>
             <HistoryPanel object={object} canEdit={canEdit} />
           </Tabs.Panel>
         </Tabs>

@@ -5,3 +5,5 @@ export * from "./review.schema.js";
 export * from "./repository.schema.js";
 export * from './account.schema.js';
 export * from './task.schema.js';
+
+export * from "./screen-implementation.schema.js";

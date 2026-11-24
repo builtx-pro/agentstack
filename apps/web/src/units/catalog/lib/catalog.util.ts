@@ -1,5 +1,5 @@
 import type { ProjectObject, ChecklistItem } from "@shared/api/schemas";
-import { asStrings, asString } from "@shared/lib/format.util";
+import { asStrings, asString, safeHttpUrl } from "@shared/lib/format.util";
 const normalize = (value: string) =>
   value.toLocaleLowerCase().replaceAll("ё", "е");
 export function filterObjects(
@@ -95,4 +95,18 @@ export function markdownChecklist(markdown: string) {
 }
 export function objectImageId(object: ProjectObject) {
   return asString(object.data.imageFileId) || asString(object.data.fileId);
+}
+
+export function previewAction(object: ProjectObject) {
+  const url = safeHttpUrl(object.data.previewUrl);
+  if (!url) return;
+  const mode =
+    object.kind === "screen" && object.data.previewMode === "tab"
+      ? "tab"
+      : "embed";
+  if (mode === "tab") {
+    const parsed = new URL(url);
+    if (parsed.username || parsed.password) return;
+  }
+  return { mode, url } as const;
 }

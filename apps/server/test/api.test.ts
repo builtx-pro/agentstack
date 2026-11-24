@@ -1817,7 +1817,19 @@ it("upgrades v2 claims with explicitly unknown rules and preserves original hist
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT status,version,claimed_rule_revisions FROM notes WHERE id=$1",[noteId])).rows[0]).toEqual({status:"in_progress",version:2,claimed_rule_revisions:null});
     expect((await old.query("SELECT snapshot FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].snapshot).toEqual(historical);
+    expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(7);
+    const screenId=randomUUID();
+    const metadata={objectVersion:1,designVersion:1,implementations:[]};
+    await old.query("INSERT INTO objects(id,project_id,key,kind,title,visibility,status,screen_metadata) VALUES($1,$2,'upgrade-screen','screen','Upgrade screen','team','backlog',$3)",[screenId,project,metadata]);
+    await old.query(await readFile(new URL("../../../tools/setup/rollback-schema-7.sql",import.meta.url),"utf8"));
     expect((await old.query("SELECT max(version) AS version FROM schema_migrations")).rows[0].version).toBe(6);
+    await old.query("UPDATE objects SET version=version+1 WHERE id=$1",[screenId]);
+    await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
+    const restoredMetadata = (await old.query("SELECT * FROM objects WHERE id=$1",[screenId])).rows[0];
+    expect(restoredMetadata.screen_metadata).toEqual(metadata);
+    const {objectDto}=await import("../src/objects/objects.service.js");
+    expect(objectDto(restoredMetadata).designVersion).toBe(2);
+
     await migrate(url.toString(),process.env.APP_DATABASE_PASSWORD!);
     expect((await old.query("SELECT count(*)::int AS count FROM note_revisions WHERE note_id=$1",[noteId])).rows[0].count).toBe(1);
   }finally{await old?.end();if(created)await owner.query(`DROP DATABASE ${databaseName}`);await owner.end();}
@@ -2227,3 +2239,274 @@ it("applies all 600 drafts produced by 200 epic files with unique milestones", a
     result.json().objects.filter((o: any) => o.kind === "wave"),
   ).toHaveLength(200);
 }, 30000);
+
+it("tracks reported builds independently by platform and preserves them across design changes, restore and imports", async () => {
+  const object = await createObject("screen", "Build evidence", {
+    frame: "mobile",
+  });
+  const path = `/projects/${pid}/objects/${object.id}`;
+  const evidence = {
+    platform: "android",
+    state: "implemented",
+    designVersion: 1,
+    build: "2.3 (42)",
+    commit: "5ac92ab",
+    evidenceUrl: "https://example.test/releases/42",
+  };
+  expect(object).toMatchObject({ designVersion: 1, implementations: [] });
+  const record = (
+    expectedVersion: number,
+    screenImplementation: unknown,
+    cookie = developer,
+  ) => req("PATCH", path, { expectedVersion, screenImplementation }, cookie);
+  expect((await record(1, evidence, customer)).statusCode).toBe(403);
+  expect((await record(1, evidence, foreign)).statusCode).toBe(404);
+  expect((await record(1, { ...evidence, designVersion: 99 })).statusCode).toBe(
+    422,
+  );
+  expect(
+    (await record(1, { ...evidence, evidenceUrl: "javascript:alert(1)" }))
+      .statusCode,
+  ).toBe(400);
+  const recorded = await record(1, evidence);
+  expect(recorded.statusCode, recorded.body).toBe(200);
+  expect(recorded.json()).toMatchObject({
+    version: 2,
+    designVersion: 1,
+    implementations: [{ ...evidence, source: "human" }],
+  });
+  expect((await record(1, evidence)).statusCode).toBe(409);
+  expect(
+    (await record(2, { ...evidence, platform: "ios", state: "partial" })).json()
+      .implementations,
+  ).toHaveLength(2);
+  expect(
+    (await req("PATCH", path, { expectedVersion: 3, tags: ["test"] })).json()
+      .designVersion,
+  ).toBe(1);
+  const redesign = await req("PATCH", path, {
+    expectedVersion: 4,
+    data: { frame: "desktop" },
+  });
+  expect(redesign.json()).toMatchObject({
+    version: 5,
+    designVersion: 5,
+    tags: ["test"],
+  });
+  expect(
+    redesign
+      .json()
+      .implementations.map(
+        (item: { designVersion: number }) => item.designVersion,
+      ),
+  ).toEqual([1, 1]);
+  expect((await record(5, { ...evidence, designVersion: 2 })).statusCode).toBe(
+    422,
+  );
+  const changed = await record(5, {
+    ...evidence,
+    state: "app_changed",
+    designVersion: 5,
+  });
+  expect(changed.json().designVersion).toBe(5);
+  const restored = await req("POST", path + "/restore", {
+    expectedVersion: 6,
+    revisionVersion: 1,
+    reason: "Original layout",
+  });
+  expect(restored.statusCode, restored.body).toBe(200);
+  expect(restored.json()).toMatchObject({
+    designVersion: 7,
+    data: { frame: "mobile" },
+  });
+  expect(restored.json().implementations).toHaveLength(2);
+  const draft = {
+    key: object.key,
+    kind: "screen",
+    title: object.title,
+    visibility: "customer",
+    tags: [],
+    status: "backlog",
+    data: { frame: "mobile" },
+  };
+  const imported = await req(
+    "POST",
+    `/projects/${pid}/import`,
+    { dryRun: true, manifest: { schemaVersion: 1, objects: [draft] } },
+    admin,
+    { "idempotency-key": randomUUID() },
+  );
+  expect(imported.statusCode, imported.body).toBe(200);
+  expect(imported.json().unchanged).toBe(1);
+  const history = (await req("GET", path + "/history")).json().items;
+  expect(
+    history.find((v: { version: number }) => v.version === 2).snapshot
+      .designVersion,
+  ).toBe(1);
+});
+
+it("keeps private build reports private after a screen becomes visible to customers", async () => {
+  const screen = await createObject("screen", "Private proof", {}, "team");
+  const path = `/projects/${pid}/objects/${screen.id}`;
+  const proof = {
+    platform: "web",
+    state: "partial",
+    designVersion: 1,
+    build: "web-test",
+    evidenceUrl: "https://example.test/team-only",
+  };
+  expect(
+    (
+      await req("PATCH", path, {
+        expectedVersion: 1,
+        screenImplementation: proof,
+      })
+    ).statusCode,
+  ).toBe(200);
+  expect(
+    (await req("PATCH", path, { expectedVersion: 2, visibility: "customer" }))
+      .statusCode,
+  ).toBe(200);
+  const owner = new Pool({
+    connectionString: process.env.TEST_DATABASE_OWNER_URL,
+  });
+  try {
+    const row = (
+      await owner.query("SELECT data FROM objects WHERE id=$1", [screen.id])
+    ).rows[0];
+    expect(row.data).toEqual({});
+    const shared = (
+      await owner.query(
+        "SELECT snapshot FROM object_revisions WHERE object_id=$1 AND visibility='customer'",
+        [screen.id],
+      )
+    ).rows;
+    expect(JSON.stringify(shared)).not.toContain(proof.evidenceUrl);
+  } finally {
+    await owner.end();
+  }
+  for (const endpoint of [
+    path,
+    path + "/history",
+    `/projects/${pid}/objects?kind=screen`,
+  ]) {
+    const response = await req("GET", endpoint, undefined, customer);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).not.toContain("https://example.test/team-only");
+  }
+});
+
+it("allows evidence for a published design while keeping unpublished designs out of public reports", async () => {
+  const screen = await createObject(
+    "screen",
+    "Publish a design",
+    { frame: "desktop" },
+    "team",
+  );
+  const path = `/projects/${pid}/objects/${screen.id}`;
+  const update = async (body: unknown) => req("PATCH", path, body);
+  const proof = {
+    platform: "ios",
+    state: "implemented",
+    build: "4",
+    evidenceUrl: "https://example.test/build/4",
+    designVersion: 1,
+  };
+  expect(
+    (await update({ expectedVersion: 1, data: { frame: "mobile" } }))
+      .statusCode,
+  ).toBe(200);
+  expect(
+    (await update({ expectedVersion: 2, visibility: "customer" })).statusCode,
+  ).toBe(200);
+  expect(
+    (await update({ expectedVersion: 3, screenImplementation: proof }))
+      .statusCode,
+  ).toBe(422);
+  expect(
+    (
+      await update({
+        expectedVersion: 3,
+        screenImplementation: { ...proof, designVersion: 2 },
+      })
+    ).statusCode,
+  ).toBe(200);
+  expect(
+    (await req("GET", path, undefined, customer)).json().implementations,
+  ).toMatchObject([{ designVersion: 2, visibility: "customer" }]);
+  expect(
+    (
+      await update({
+        expectedVersion: 4,
+        screenImplementation: { ...proof, designVersion: 2, build: "5" },
+      })
+    ).statusCode,
+  ).toBe(200);
+  const history = (
+    await req("GET", path + "/history", undefined, customer)
+  ).json().items;
+  expect(
+    history.find((entry: { version: number }) => entry.version === 4).snapshot
+      .implementations,
+  ).toMatchObject([{ build: "4" }]);
+});
+
+it("attributes scoped agent reports and keeps screen status, metadata, and other platforms intact", async () => {
+  const screen = await createObject("screen", "Agent build report");
+  const path = `/projects/${pid}/objects/${screen.id}`;
+  await req("PATCH", path, {
+    expectedVersion: 1,
+    description: "Existing brief",
+    tags: ["visual"],
+  });
+  const token = (
+    await req("POST", `/projects/${pid}/tokens`, {
+      name: "Build reporting",
+      scopes: ["read", "write"],
+      expiresInDays: 1,
+    })
+  ).json().token;
+  const headers = { authorization: `Bearer ${token}` };
+  const report = { platform: "web", state: "design_only", designVersion: 1 };
+  const patch = (
+    expectedVersion: number,
+    screenImplementation: unknown,
+    extra: Record<string, unknown> = {},
+  ) =>
+    req(
+      "PATCH",
+      path,
+      { expectedVersion, screenImplementation, ...extra },
+      "",
+      headers,
+    );
+  expect((await patch(2, { ...report, source: "human" })).statusCode).toBe(400);
+  expect((await patch(2, report, { status: "done" })).statusCode).toBe(403);
+  const updated = await patch(2, report);
+  expect(updated.statusCode, updated.body).toBe(200);
+  expect(updated.json()).toMatchObject({
+    designVersion: 1,
+    status: "backlog",
+    description: "Existing brief",
+    tags: ["visual"],
+    implementations: [{ ...report, source: "agent" }],
+  });
+  const nonScreen = await createObject("asset", "Asset evidence");
+  expect(
+    (
+      await req("PATCH", `/projects/${pid}/objects/${nonScreen.id}`, {
+        expectedVersion: 1,
+        screenImplementation: report,
+      })
+    ).statusCode,
+  ).toBe(422);
+});
+
+it("changes interactive preview presentation without creating a new design", async () => {
+  const screen=await createObject("screen","Interactive",{previewUrl:"https://example.test/screen"});
+  const path=`/projects/${pid}/objects/${screen.id}`;
+  const changed=await req("PATCH",path,{expectedVersion:1,data:{...screen.data,previewMode:"tab"}});
+  expect(changed.statusCode,changed.body).toBe(200);
+  expect(changed.json()).toMatchObject({version:2,designVersion:1,data:{previewMode:"tab"}});
+  expect((await req("PATCH",path,{expectedVersion:2,data:{...screen.data,previewMode:"unsafe"}})).statusCode).toBe(400);
+});
