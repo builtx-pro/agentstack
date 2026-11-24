@@ -1,3 +1,4 @@
+import { screenImplementationSchema, reportedImplementationSchema } from "./screen-implementation.schema.js";
 import { z } from "zod";
 export const objectKindSchema = z.enum([
   "screen",
@@ -57,7 +58,9 @@ export const objectDataSchemas = {
       palette: z.string().max(80).optional(),
       frame: z.enum(["mobile", "desktop"]).optional(),
       imageFileId: idSchema.optional(),
+      designSourceRevision: z.string().trim().min(1).max(200).optional(),
       previewUrl: urlSchema.optional(),
+      previewMode: z.literal("tab").optional(),
       sourcePath: z.string().max(500).optional(),
       assetIds: refs.optional(),
     })
@@ -146,10 +149,11 @@ export const objectPatchSchema = z
   .object({
     expectedVersion: z.number().int().positive(),
     title: textSchema.optional(),
-    description: fields.description.optional(),
-    tags: fields.tags.optional(),
+    description: fields.description.removeDefault().optional(),
+    tags: fields.tags.removeDefault().optional(),
     visibility: visibilitySchema.optional(),
     status: workStatusSchema.optional(),
+    screenImplementation: screenImplementationSchema.optional(),
     archived: z.boolean().optional(),
     data: fields.data.optional(),
   })
@@ -158,6 +162,8 @@ export const projectObjectSchema = z.object({
   ...fields,
   id: idSchema,
   projectId: idSchema,
+  designVersion: z.number().int().positive().optional(),
+  implementations: z.array(reportedImplementationSchema).optional(),
   version: z.number().int().positive(),
   archived: z.boolean(),
   createdAt: z.string(),

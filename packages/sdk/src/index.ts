@@ -7,3 +7,5 @@ export { createHumanSession } from "./human-session.service.js";
 export * from "./repository.schema.js";
 
 export * from './task.schema.js';
+
+export * from "@agentstack/contracts/screen-implementation";

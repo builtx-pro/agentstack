@@ -11,11 +11,12 @@ import {
 } from "@mantine/core";
 import { IconPhoto, IconExternalLink } from "@tabler/icons-react";
 import type { ProjectObject } from "@shared/api/schemas";
-import { asString, safeHttpUrl } from "@shared/lib/format.util";
+import { asString } from "@shared/lib/format.util";
 import { fileUrl } from "@shared/api/client";
 import { MarkdownContent } from "@shared/ui/markdown-content.component";
 import {
   objectImageId,
+  previewAction,
   readChecklist,
   markdownChecklist,
   replaceChecklistLine,
@@ -36,21 +37,34 @@ export function ObjectPreview({
   const [live, setLive] = useState(false);
   const mutation = WorkspaceService.useWorkspaceMutation(object.projectId);
   const imageId = objectImageId(object);
-  const preview = safeHttpUrl(object.data.previewUrl);
+  const preview = previewAction(object);
   const checklist = readChecklist(object.data);
   const mdChecks = markdownChecklist(asString(object.data.markdown));
   return (
     <Stack gap="md">
       {["screen", "asset"].includes(object.kind) ? (
         <>
-          {live && preview ? (
+          {!compact && preview?.mode === "tab" && (
+            <Group>
+              <Button
+                component="a"
+                href={preview.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                leftSection={<IconExternalLink size={16} />}
+              >
+                {t("Open interactive screen")}
+              </Button>
+            </Group>
+          )}
+          {live && preview?.mode === "embed" ? (
             <iframe
               className={classes.live}
               data-frame={
                 object.data.frame === "desktop" ? "desktop" : "mobile"
               }
               title={t("Isolated preview: {title}", { title: object.title })}
-              src={preview}
+              src={preview.url}
               sandbox="allow-scripts"
               referrerPolicy="no-referrer"
             />
@@ -89,14 +103,14 @@ export function ObjectPreview({
               {t("Download image")}
             </Anchor>
           )}
-          {!compact && preview && (
+          {!compact && preview?.mode === "embed" && (
             <Group>
               <Button variant="light" onClick={() => setLive(!live)}>
                 {live ? t("Show screenshot") : t("Open isolated live preview")}
               </Button>
               <Anchor
                 size="sm"
-                href={preview}
+                href={preview.url}
                 target="_blank"
                 rel="noopener noreferrer"
               >

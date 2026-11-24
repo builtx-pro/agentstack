@@ -18,6 +18,7 @@ export const capabilities = {
   features: [
     "projects",
     "screens",
+    "screen-implementation-evidence",
     "assets",
     "reviews",
     "documents",

@@ -9,6 +9,8 @@ The server implements MCP stdio using the official TypeScript SDK. It exposes to
 | `get_project_context` | Bounded rules, docs, planning and open notes | read |
 | `search_objects` | Screens/assets/flows/docs/planning search | read |
 | `get_object` | Exact object and current revision | read |
+| `update_screen_design` | Publish an immutable screenshot or a versioned preview on a screen | read, write |
+| `record_screen_implementation` | Record one platform's reported state and build evidence against a design revision | write |
 | `list_review_items` | Notes by status or target | read |
 | `get_history` | Authorized object/note revisions | read |
 | `get_progress` | Real project/group progress | read |
@@ -36,3 +38,5 @@ Implementation reference: [official SDK v1 server guide](https://ts.sdk.modelcon
 ## Repository tools
 
 `list_repositories`, `list_repository_snapshots`, `get_repository_snapshot` and `get_repository_pipelines` are scoped read tools. `refresh_repository` takes the current `expectedVersion` and stages provider data with write scope. It never applies it. There are no filesystem, checkout or snapshot-apply tools. Set `AGENTSTACK_TIMEOUT_MS=120000` for provider requests and configure the host tool timeout accordingly. See [repository sync and human review](repository-sync.md).
+
+For versioned screen and build examples, see [screen design revisions and application builds](../api/screen-implementation.md).

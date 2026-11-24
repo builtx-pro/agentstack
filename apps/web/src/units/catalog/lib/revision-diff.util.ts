@@ -1,6 +1,6 @@
 import type {ProjectObject,ReviewNote} from '@shared/api/schemas';
 export interface FieldChange{path:string;before:unknown;after:unknown}
-const fields=['title','description','tags','visibility','status','archived','data'] as const;
+const fields=['title','description','tags','visibility','status','archived','data','implementations'] as const;
 const isRecord=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
 export function revisionChanges(previous:ProjectObject,current:ProjectObject):FieldChange[]{
  const changes:FieldChange[]=[];

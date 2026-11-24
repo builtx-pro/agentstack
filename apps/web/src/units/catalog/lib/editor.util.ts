@@ -6,4 +6,16 @@ export function editorValues(object?:ProjectObject,kind:ObjectKind='screen'):Edi
 export function toObjectDraft(v:EditorValues):ObjectDraft{const optional=(value:string)=>value.trim()||undefined;let data:Record<string,unknown>={};switch(v.kind){case 'screen':data={screenId:optional(v.screenId),variant:optional(v.variant),palette:optional(v.palette),frame:v.frame,imageFileId:optional(v.fileId),previewUrl:optional(v.previewUrl),sourcePath:optional(v.sourcePath),assetIds:v.assetIds};break;case 'asset':data={fileId:optional(v.fileId),category:optional(v.category),source:optional(v.source),license:optional(v.license),variant:optional(v.variant)};break;case 'flow':data={screenIds:v.screenIds,stateIds:v.stateIds,role:optional(v.role),phase:optional(v.phase)};break;case 'document':case 'rule':data={markdown:v.markdown};break;case 'epic':data={waveId:optional(v.waveId)};break;case 'sprint':data={goal:optional(v.goal),startDate:optional(v.startDate),endDate:optional(v.endDate)};break;case 'story':data={epicId:optional(v.epicId),sprintId:optional(v.sprintId),featureIds:v.featureIds,priority:v.priority,blocked:v.blocked,checklist:v.checklist};break;case 'proposal':data={proposalType:v.proposalType,decision:optional(v.decision)};break;}return{key:v.key.trim(),kind:v.kind,title:v.title.trim(),description:v.description.trim(),tags:v.tags,visibility:v.visibility,status:v.status,data};}
 export function optionsOf(objects:ProjectObject[],kind:ObjectKind){return objects.filter(o=>o.kind===kind&&!o.archived).map(o=>({value:o.id,label:o.title}));}
 
-export function editorPatch(object:ProjectObject,draft:ObjectDraft){return{expectedVersion:object.version,title:draft.title,description:draft.description,tags:draft.tags,visibility:draft.visibility,status:draft.status,data:{...object.data,...draft.data}};}
+export function editorPatch(object:ProjectObject,draft:ObjectDraft) {
+  let data = {...object.data,...draft.data};
+  if (object.kind === "screen") {
+    // Old screen records may omit editor defaults such as frame and assetIds.
+    // Only actual edits should produce changes to the design revision.
+    const initial = toObjectDraft(editorValues(object)).data;
+    data = {...object.data};
+    for (const [field,value] of Object.entries(draft.data)) {
+      if (JSON.stringify(initial[field]) !== JSON.stringify(value)) data[field] = value;
+    }
+  }
+  return {expectedVersion:object.version,title:draft.title,description:draft.description,tags:draft.tags,visibility:draft.visibility,status:draft.status,data};
+}

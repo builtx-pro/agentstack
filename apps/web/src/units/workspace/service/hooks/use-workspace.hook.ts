@@ -55,7 +55,7 @@ export function useActivity(id: string, enabled = true) {
     enabled: !!id && enabled,
   });
 }
-export function useWorkspaceMutation(id: string) {
+export function useWorkspaceMutation(id: string, onError?: (error: Error) => void) {
   const client = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -67,6 +67,7 @@ export function useWorkspaceMutation(id: string) {
       method?: string;
       body?: unknown;
     }) => api.mutateWorkspace(path, method, body),
+    onError,
     onSuccess: (result, write) => reconcileWorkspace(client, id, write, result),
   });
 }

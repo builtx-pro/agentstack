@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { readFile } from "node:fs/promises";
-export const CURRENT_SCHEMA_VERSION = 6;
+export const CURRENT_SCHEMA_VERSION = 7;
 const migrations = [
   { version: 1, file: "001-initial.sql" },
   { version: 2, file: "002-user-audit.sql" },
@@ -8,6 +8,7 @@ const migrations = [
   { version: 4, file: "004-repository-connections.sql" },
   { version: 5, file: "005-accounts.sql" },
   { version: 6, file: "006-personal-tasks.sql" },
+  { version: 7, file: "007-screen-implementation.sql" },
 ] as const;
 export async function migrate(ownerUrl: string, applicationPassword: string) {
   if (applicationPassword.length < 24)

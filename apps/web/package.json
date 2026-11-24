@@ -12,6 +12,7 @@
     "test:themes:production": "playwright test --config playwright.production.config.ts"
   },
   "dependencies": {
+    "@agentstack/contracts": "*",
     "@agentstack/ui": "file:../../packages/ui",
     "@mantine/core": "9.7.5",
     "@mantine/form": "9.7.5",

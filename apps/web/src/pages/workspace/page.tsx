@@ -1,5 +1,6 @@
 import {ProjectTasks} from "@units/tasks/ui/project-tasks.component";
 import { useI18n } from "@shared/i18n";
+import { useFocusReturn } from "@mantine/hooks";
 import { Navigate, useParams } from "@tanstack/react-router";
 import { Stack, Group, Title, Text, Button, Menu, Alert } from "@mantine/core";
 import { IconPlus, IconChevronDown } from "@tabler/icons-react";
@@ -24,6 +25,8 @@ export function WorkspacePage() {
 function ProjectWorkspace() {
   const { t } = useI18n();
   const vm = useWorkspacePage();
+  // The URL-driven viewer unmounts on close, including browser Back.
+  useFocusReturn({ opened: !!vm.selected });
   if (vm.auth.isPending) return <QueryState pending />;
   if (!vm.auth.data) return <Navigate to="/login" />;
   if (!vm.project.data)
@@ -220,6 +223,7 @@ function ProjectWorkspace() {
       </Stack>
       {vm.selected && !vm.editor && (
         <ObjectViewer
+          key={vm.selected.id}
           onTag={vm.filterTag}
           object={vm.selected}
           objects={vm.objects.data ?? []}
