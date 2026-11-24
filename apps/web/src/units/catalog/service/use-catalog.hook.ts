@@ -26,6 +26,7 @@ export function useCatalogFilters() {
     void navigate({
       search: (previous) => ({ ...previous, ...patch }),
       replace: !("selected" in patch),
+      resetScroll: !("selected" in patch),
     });
   const debounced = useDebouncedCallback((q: string) => {
     pendingCommit.current = q;
