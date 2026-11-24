@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import { useI18n } from "@shared/i18n";
 import { Text, Group, Badge, Button } from "@mantine/core";
 import { IconMessageCircle, IconArrowUpRight } from "@tabler/icons-react";
@@ -16,6 +17,11 @@ export function ObjectCard({
   onTag: (tag: string, object: ProjectObject) => void;
 }) {
   const { t } = useI18n();
+  const openViewer = (event: MouseEvent<HTMLButtonElement>) => {
+    // WebKit does not focus a button on pointer activation.
+    event.currentTarget.focus({ preventScroll: true });
+    onOpen();
+  };
   return (
     <article
       className={classes.card}
@@ -30,7 +36,7 @@ export function ObjectCard({
       <button
         type="button"
         className={classes.cardPreview}
-        onClick={onOpen}
+        onClick={openViewer}
         aria-label={t("Review {title}", { title: object.title })}
       >
         <ObjectPreview object={object} compact />
@@ -70,7 +76,7 @@ export function ObjectCard({
         <Button
           variant="subtle"
           rightSection={<IconArrowUpRight size={14} />}
-          onClick={onOpen}
+          onClick={openViewer}
         >
           {t("Review")}
         </Button>
